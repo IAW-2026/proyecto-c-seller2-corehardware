@@ -22,7 +22,7 @@ model Product {
   model     String
   price     Decimal 
   stock     Int
-  isDeleted Boolean           
+  isDeleted Boolean  @default(false)           
 }
 
 model Seller {
