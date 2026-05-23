@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../prisma/generated/client";
+import { PrismaClient, Prisma} from "../app/generated/prisma/client";
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const pool = new Pool({ connectionString });
@@ -16,8 +16,7 @@ async function main() {
         },
         brand: "Brand 1",
         model: "Model 1",
-        price: prisma.Decimal(19.99),
-        description: "Description for Product 1",
+        price: new Prisma.Decimal(19.99),
         stock: 100, 
     }
   });
@@ -29,8 +28,7 @@ async function main() {
         },
         brand: "Brand 2",
         model: "Model 2",
-        price: prisma.Decimal(29.99),
-        description: "Description for Product 2",
+        price: new Prisma.Decimal(29.99),
         stock: 50, 
     }
   });
@@ -42,8 +40,7 @@ async function main() {
         },
         brand: "Brand 1",
         model: "Model 3",
-        price: prisma.Decimal(39.99),
-        description: "Description for Product 3",
+        price: new Prisma.Decimal(39.99),
         stock: 25,
     }
   });    
