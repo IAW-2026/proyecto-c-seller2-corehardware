@@ -1,8 +1,32 @@
-'use-server';
+'use server';
 
 import { Prisma, PrismaClient } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { z } from "zod";
+
+export type Product ={
+    id: number;
+    sellerId: number;
+    name: string;
+    brand: string;
+    model: string;
+    price: string;
+    stock: number;
+    isDeleted: boolean;
+}
+
+function prismaProductToProduct(prismaProduct: Prisma.ProductModel): Product {
+    return {
+        id: prismaProduct.id,
+        sellerId: prismaProduct.sellerId,
+        name: prismaProduct.name,
+        brand: prismaProduct.brand,
+        model: prismaProduct.model,
+        price: prismaProduct.price.toString(),
+        stock: prismaProduct.stock,
+        isDeleted: prismaProduct.isDeleted,
+    };
+}
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const prisma = new PrismaClient({
@@ -30,6 +54,8 @@ const editProductSchema = z.object({
 
 const deleteProductSchema = z.object({ id: z.coerce.number().int().positive({ message: "Product ID must be a positive integer" }) });
 
+
+// Remember to only handle seller differently, and just pass the rest of the data on the full version
 export async function createProduct(data: z.infer<typeof createProductSchema>) {
   const validatedData = createProductSchema.parse(data);
   const product = await prisma.product.create( 
@@ -47,7 +73,7 @@ export async function createProduct(data: z.infer<typeof createProductSchema>) {
         price: new Prisma.Decimal(validatedData.price),
         stock: validatedData.stock,
    }});
-  return product;
+  return prismaProductToProduct(product);
 }
 
 export async function editProduct(data: z.infer<typeof editProductSchema>) {
@@ -61,7 +87,7 @@ export async function editProduct(data: z.infer<typeof editProductSchema>) {
             price: newPrice,
         },
     });
-    return product;
+    return prismaProductToProduct(product);
 }
 
 export async function deleteProduct(data: z.infer<typeof deleteProductSchema>) {
@@ -71,12 +97,12 @@ export async function deleteProduct(data: z.infer<typeof deleteProductSchema>) {
         where: { id },
         data: { isDeleted: true },
     });
-    return product;
+    return prismaProductToProduct(product);
 }
 
 export async function getProducts() {
     const products = await prisma.product.findMany({
         where: { isDeleted: false },
     });
-    return products;
+    return products.map(prismaProductToProduct);
 }
