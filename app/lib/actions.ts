@@ -1,10 +1,10 @@
 'use server';
 
-import { Prisma, PrismaClient } from "../generated/prisma/client";
+import { Prisma, PrismaClient } from "@prismaGenerated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { z } from "zod";
 
-export type Product ={
+export type Product = {
     id: number;
     sellerId: number;
     name: string;
@@ -13,7 +13,13 @@ export type Product ={
     price: string;
     stock: number;
     isDeleted: boolean;
-}
+};
+
+export type State = {
+    product: Product | null;
+    loading: boolean;
+    error: string | null;
+};
 
 function prismaProductToProduct(prismaProduct: Prisma.ProductModel): Product {
     return {
@@ -32,7 +38,7 @@ const connectionString = `${process.env.DATABASE_URL}`;
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 });
-
+ 
 const createProductSchema = z.object({
   name: z.string(),
   sellerId: z.coerce.number().int().positive({ message: "Seller ID must be a positive integer" }).optional(),
@@ -41,6 +47,7 @@ const createProductSchema = z.object({
   price: z.coerce.number().gt(0, { message: "Price must be greater than 0" }),
   stock: z.coerce.number().int().nonnegative({ message: "Stock must be a non-negative integer" }),
 });
+
 
 const editProductSchema = z.object({
     id: z.coerce.number().int().positive({ message: "Product ID must be a positive integer" }),

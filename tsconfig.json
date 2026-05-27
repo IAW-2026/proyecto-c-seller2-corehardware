@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@lib/*": ["./app/lib/*"],
+      "@prismaGenerated/*": ["./app/generated/prisma/*"]
     }
   },
   "include": [

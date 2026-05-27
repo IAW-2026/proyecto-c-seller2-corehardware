@@ -1,7 +1,5 @@
 "use client";
-import React from "react";
-import { PrismaClient } from "../generated/prisma/client";
-import { getProducts, Product } from "../lib/actions";
+import { getProducts, Product } from "@lib/actions";
 import { useEffect, useState } from "react";
 
 

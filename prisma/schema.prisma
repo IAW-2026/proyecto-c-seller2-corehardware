@@ -16,7 +16,7 @@ model Product {
   id        Int     @id @default(autoincrement())
   name      String
   seller    Seller  @relation(fields: [sellerId], references: [id])
-  sellerId  Int     @unique
+  sellerId  Int     
   brand     String
   model     String
   price     Decimal
@@ -26,5 +26,5 @@ model Product {
 
 model Seller {
   id      Int      @id @default(autoincrement())
-  product Product?
+  product Product[]
 }
