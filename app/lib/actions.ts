@@ -3,6 +3,7 @@
 import { Prisma, PrismaClient } from "@prismaGenerated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { z } from "zod";
+import { revalidatePath } from 'next/cache';
 
 export type Product = {
     id: number;
@@ -18,7 +19,7 @@ export type Product = {
 export type State = {
     product: Product | null;
     loading: boolean;
-    error: string | null;
+    errors: string[] | null;
 };
 
 function prismaProductToProduct(prismaProduct: Prisma.ProductModel): Product {
@@ -62,12 +63,20 @@ const editProductSchema = z.object({
 const deleteProductSchema = z.object({ id: z.coerce.number().int().positive({ message: "Product ID must be a positive integer" }) });
 
 
-// Remember to only handle seller differently, and just pass the rest of the data on the full version
-export async function createProduct(data: z.infer<typeof createProductSchema>) {
-  const validatedData = createProductSchema.parse(data);
+type CreateProductRequestType = {
+    name: string;
+    sellerId?: number;
+    brand: string;
+    model: string;
+    price: number;
+    stock: number;
+}
+
+export async function createProduct(validatedData: CreateProductRequestType) {
+  const {sellerId, price, ...restData} = validatedData;
   const product = await prisma.product.create( 
     { data: {
-        name: validatedData.name,
+        ...restData,
         seller: validatedData.sellerId ?
             { 
                 connect: { id: validatedData.sellerId } 
@@ -75,11 +84,9 @@ export async function createProduct(data: z.infer<typeof createProductSchema>) {
             {
                 create : { }
             },
-        brand: validatedData.brand,
-        model: validatedData.model,
         price: new Prisma.Decimal(validatedData.price),
-        stock: validatedData.stock,
    }});
+   revalidatePath("/products");
   return prismaProductToProduct(product);
 }
 
@@ -94,6 +101,7 @@ export async function editProduct(data: z.infer<typeof editProductSchema>) {
             price: newPrice,
         },
     });
+    revalidatePath("/products");
     return prismaProductToProduct(product);
 }
 
@@ -104,6 +112,7 @@ export async function deleteProduct(data: z.infer<typeof deleteProductSchema>) {
         where: { id },
         data: { isDeleted: true },
     });
+    revalidatePath("/products");
     return prismaProductToProduct(product);
 }
 

@@ -1,3 +1,5 @@
+"use client";
+
 import CreateProductForm from "./createProductForm";
 
 
@@ -8,7 +10,7 @@ export default function Home() {
                 <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
                     <CreateProductForm />  
                     <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" onClick={() => window.location.href = "/products"}>
-                        Back to Products
+                        Volver a Productos
                     </button>  
                 </div>
             </main>
