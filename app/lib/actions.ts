@@ -41,18 +41,6 @@ const connectionString = `${process.env.DATABASE_URL}`;
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 });
- 
-
-
-const editProductSchema = z.object({
-    id: z.coerce.number().int().positive({ message: "Product ID must be a positive integer" }),
-    name: z.string().optional(),
-    sellerId: z.coerce.number().int().positive({ message: "Seller ID must be a positive integer" }).optional(),
-    brand: z.string().optional(),
-    model: z.string().optional(),
-    price: z.coerce.number().gt(0, { message: "Price must be greater than 0" }).optional(),
-    stock: z.coerce.number().int().nonnegative({ message: "Stock must be a non-negative integer" }).optional(),
-});
 
 
 type CreateProductRequestType = {
@@ -82,8 +70,17 @@ export async function createProduct(validatedData: CreateProductRequestType) {
   return prismaProductToProduct(product);
 }
 
-export async function editProduct(data: z.infer<typeof editProductSchema>) {
-    const validatedData = editProductSchema.parse(data);
+type EditProductRequestType = {
+    id: number,
+    name?: string;
+    sellerId?: number;
+    brand?: string;
+    model?: string;
+    price?: number;
+    stock?: number;
+}
+
+export async function editProduct(validatedData: EditProductRequestType) {
     const { id,price, ...updateData } = validatedData;
     const newPrice = price ? new Prisma.Decimal(price) : undefined;
     const product = await prisma.product.update({
