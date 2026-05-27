@@ -16,6 +16,8 @@ export type Product = {
     isDeleted: boolean;
 };
 
+
+
 export type State = {
     product: Product | null;
     loading: boolean;
@@ -40,14 +42,6 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 });
  
-const createProductSchema = z.object({
-  name: z.string(),
-  sellerId: z.coerce.number().int().positive({ message: "Seller ID must be a positive integer" }).optional(),
-  brand: z.string(),
-  model: z.string(),
-  price: z.coerce.number().gt(0, { message: "Price must be greater than 0" }),
-  stock: z.coerce.number().int().nonnegative({ message: "Stock must be a non-negative integer" }),
-});
 
 
 const editProductSchema = z.object({
@@ -59,8 +53,6 @@ const editProductSchema = z.object({
     price: z.coerce.number().gt(0, { message: "Price must be greater than 0" }).optional(),
     stock: z.coerce.number().int().nonnegative({ message: "Stock must be a non-negative integer" }).optional(),
 });
-
-const deleteProductSchema = z.object({ id: z.coerce.number().int().positive({ message: "Product ID must be a positive integer" }) });
 
 
 type CreateProductRequestType = {
@@ -86,7 +78,7 @@ export async function createProduct(validatedData: CreateProductRequestType) {
             },
         price: new Prisma.Decimal(validatedData.price),
    }});
-   revalidatePath("/products");
+  revalidatePath("/products");
   return prismaProductToProduct(product);
 }
 
@@ -95,7 +87,7 @@ export async function editProduct(data: z.infer<typeof editProductSchema>) {
     const { id,price, ...updateData } = validatedData;
     const newPrice = price ? new Prisma.Decimal(price) : undefined;
     const product = await prisma.product.update({
-        where: { id },
+        where: { id, isDeleted:false },
         data: {
             ...updateData,
             price: newPrice,
@@ -105,11 +97,12 @@ export async function editProduct(data: z.infer<typeof editProductSchema>) {
     return prismaProductToProduct(product);
 }
 
-export async function deleteProduct(data: z.infer<typeof deleteProductSchema>) {
-    const validatedData = deleteProductSchema.parse(data);
+type DeleteProductRequestType = { id:number }
+
+export async function deleteProduct(validatedData:DeleteProductRequestType) {
     const { id } = validatedData;
     const product = await prisma.product.update({
-        where: { id },
+        where: { id, isDeleted:false },
         data: { isDeleted: true },
     });
     revalidatePath("/products");
