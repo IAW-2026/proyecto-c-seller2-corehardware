@@ -76,7 +76,7 @@ export default function CreateProductForm() {
             <input type="number" name="sellerId" placeholder="Seller ID" className="border p-2 rounded" />
             <input type="text" name="brand" placeholder="Marca" className="border p-2 rounded" required />
             <input type="text" name="model" placeholder="Modelo" className="border p-2 rounded" required />
-            <input type="number" step="0.5" name="price" placeholder="0.00" className="border p-2 rounded" required />
+            <input type="number" step="0.01" name="price" placeholder="0.00" className="border p-2 rounded" required />
             <input type="number" name="stock" placeholder="0" className="border p-2 rounded" required />
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
                 {state.loading ? "Creando..." : "Crear Producto"}
