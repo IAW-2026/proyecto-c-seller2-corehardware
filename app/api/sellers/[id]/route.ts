@@ -6,7 +6,7 @@ import { headers } from "next/dist/server/request/headers";
 import { NextRequest } from "next/dist/server/web/spec-extension/request";
 import { Prisma } from "@prismaGenerated/client";
 
-export async function GET({params}: {request:NextRequest,params: Promise<{ id: string }>}) {
+export async function GET(request: NextRequest, {params}: {params: Promise<{ id: string }>}) {
     const { id } = await params;
     const sellerId = Number(id);
     const requestHeaders = await headers();
