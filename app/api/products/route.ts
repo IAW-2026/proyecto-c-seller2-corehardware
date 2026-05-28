@@ -7,11 +7,14 @@ import { Prisma } from "@prismaGenerated/client";
 
 const createProductSchema = z.object({
   name: z.string(),
-  sellerId: z.coerce.number().int().positive({ message: "El Seller ID debe ser un entero positivo" }).optional(),
+  sellerId: z.coerce.number().int().positive({ message: "El Seller ID debe ser un entero positivo" }),
   brand: z.string(),
   model: z.string(),
   price: z.coerce.number().gt(0, { message: "El precio debe ser mayor que 0" }),
   stock: z.coerce.number().int().nonnegative({ message: "El stock debe ser un entero no negativo" }),
+  specs: z.string(),
+  warranty: z.string(),
+  image: z.string().url({ message: "La imagen debe ser una URL válida" }),
 });
 
 
@@ -32,6 +35,9 @@ export async function POST(request: NextRequest) {
         model: data.model,
         price: data.price,
         stock: data.stock,
+        specs: data.specs,
+        warranty: data.warranty,
+        image: data.image,
     });
     
     if (!validatedData.success) {
@@ -92,6 +98,9 @@ const editProductSchema = z.object({
     model: z.string().optional(),
     price: z.coerce.number().gt(0, { message: "El precio debe ser mayor que 0" }).optional(),
     stock: z.coerce.number().int().nonnegative({ message: "El stock debe ser un entero no negativo" }).optional(),
+    specs: z.string().optional(),
+    warranty: z.string().optional(),
+    image: z.string().url({ message: "La imagen debe ser una URL válida" }).optional(),
 });
 
 export async function PUT(request: NextRequest) {
@@ -112,6 +121,9 @@ export async function PUT(request: NextRequest) {
         model: data.model,
         price: data.price,
         stock: data.stock,
+        specs: data.specs,
+        warranty: data.warranty,
+        image: data.image,
     });
     
     if (!validatedData.success) {

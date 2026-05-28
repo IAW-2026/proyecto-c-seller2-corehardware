@@ -13,7 +13,9 @@ export default function DeleteProduct({params}: {params: Promise<{ id: string }>
         model : "",
         stock : 0,
         price : "",
-        isDeleted : false
+        specs : "",
+        warranty : "",
+        imageUrl : "",
     }
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState(emptyProduct);
@@ -47,11 +49,14 @@ export default function DeleteProduct({params}: {params: Promise<{ id: string }>
             <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
                 <h1 className="text-3xl font-bold mb-4">Producto Eliminado Exitosamente!</h1>
                 <p>Nombre: {product.name}</p>
-                <p>Seller ID: {product.sellerId}</p>
+                <p>Id del Vendedor: {product.sellerId}</p>
                 <p>Marca: {product.brand}</p>
                 <p>Modelo: {product.model}</p>
                 <p>Precio: ${product.price}</p>
                 <p>Stock: {product.stock}</p>
+                <p>Especificaciones: {product.specs}</p>
+                <p>Garantía: {product.warranty}</p>
+                <p>URL de la Imagen: {product.imageUrl}</p>
             </div>
         )
     }

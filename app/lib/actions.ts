@@ -13,7 +13,9 @@ export type Product = {
     model: string;
     price: string;
     stock: number;
-    isDeleted: boolean;
+    specs: string;
+    warranty: string;
+    imageUrl: string;
 };
 
 
@@ -31,9 +33,11 @@ function prismaProductToProduct(prismaProduct: Prisma.ProductModel): Product {
         name: prismaProduct.name,
         brand: prismaProduct.brand,
         model: prismaProduct.model,
+        specs: prismaProduct.specs,
+        warranty: prismaProduct.warranty,
+        imageUrl: prismaProduct.image,
         price: prismaProduct.price.toString(),
         stock: prismaProduct.stock,
-        isDeleted: prismaProduct.isDeleted,
     };
 }
 
@@ -45,11 +49,14 @@ const prisma = new PrismaClient({
 
 type CreateProductRequestType = {
     name: string;
-    sellerId?: number;
+    sellerId: number;
     brand: string;
     model: string;
     price: number;
     stock: number;
+    specs: string;
+    warranty: string;
+    image: string;
 }
 
 export async function createProduct(validatedData: CreateProductRequestType) {
@@ -57,13 +64,7 @@ export async function createProduct(validatedData: CreateProductRequestType) {
   const product = await prisma.product.create( 
     { data: {
         ...restData,
-        seller: validatedData.sellerId ?
-            { 
-                connect: { id: validatedData.sellerId } 
-            }:
-            {
-                create : { }
-            },
+        seller: { connect: { id: validatedData.sellerId } },
         price: new Prisma.Decimal(validatedData.price),
    }});
   revalidatePath("/products");
@@ -78,6 +79,9 @@ type EditProductRequestType = {
     model?: string;
     price?: number;
     stock?: number;
+    specs?: string;
+    warranty?: string;
+    image?: string;
 }
 
 export async function editProduct(validatedData: EditProductRequestType) {
