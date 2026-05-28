@@ -12,6 +12,7 @@ type createProductForm ={
     stock: number;
     specs: string;
     warranty: string;
+    description: string;
     image: string;
 }
 
@@ -33,6 +34,7 @@ export default function CreateProductForm() {
             model: entries.model as string,
             price: entries.price ? Number(entries.price) : 0.00,
             stock: entries.stock ? Number(entries.stock) : 0,
+            description: entries.description as string,
             specs: entries.specs as string,
             warranty: entries.warranty as string,
             image: entries.image as string,
@@ -72,6 +74,7 @@ export default function CreateProductForm() {
                 <p>Modelo: {state.product.model}</p>
                 <p>Precio: ${state.product.price}</p>
                 <p>Stock: {state.product.stock}</p>
+                <p>Descripción: {state.product.description}</p>
                 <p>Especificaciones: {state.product.specs}</p>
                 <p>Garantía: {state.product.warranty}</p>
                 <p>URL de la Imagen: {state.product.imageUrl}</p>
@@ -87,6 +90,7 @@ export default function CreateProductForm() {
             <input type="text" name="model" placeholder="Modelo" className="border p-2 rounded" required />
             <input type="number" step="0.01" name="price" placeholder="0.00" className="border p-2 rounded" required />
             <input type="number" name="stock" placeholder="0" className="border p-2 rounded" required />
+            <input type="text" name="description" placeholder="Descripción del producto" className="border p-2 rounded" required />
             <input type="text" name="specs" placeholder="Especificaciones" className="border p-2 rounded" required />
             <input type="text" name="warranty" placeholder="Garantía" className="border p-2 rounded" required />
             <input type="url" name="image" placeholder="URL de la imagen" className="border p-2 rounded" required />

@@ -12,6 +12,7 @@ type editProductForm ={
     model?: string;
     price?: number;
     stock?: number;
+    description?: string;
     specs?: string;
     warranty?: string;
     image?: string;
@@ -37,6 +38,7 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
             model: entries.model ? entries.model as string : undefined,
             price: entries.price ? Number(entries.price) : undefined,
             stock: entries.stock ? Number(entries.stock) : undefined,
+            description: entries.description ? entries.description as string : undefined,
             specs: entries.specs ? entries.specs as string : undefined,
             warranty: entries.warranty ? entries.warranty as string : undefined,
             image: entries.image ? entries.image as string : undefined,
@@ -76,6 +78,7 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
                 <p>Modelo: {state.product.model}</p>
                 <p>Precio: ${state.product.price}</p>
                 <p>Stock: {state.product.stock}</p>
+                <p>Descripción: {state.product.description}</p>
                 <p>Especificaciones: {state.product.specs}</p>
                 <p>Garantía: {state.product.warranty}</p>
                 <p>URL de la Imagen: {state.product.imageUrl}</p>
@@ -91,6 +94,7 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
             <input type="text" name="model" placeholder="Nuevo Modelo" className="border p-2 rounded"  />
             <input type="number" step="0.01" name="price" placeholder="Nuevo Precio" className="border p-2 rounded"  />
             <input type="number" name="stock" placeholder="Nuevo Stock" className="border p-2 rounded"  />
+            <input type="text" name="description" placeholder="Descripción del producto" className="border p-2 rounded" />
             <input type="text" name="specs" placeholder="Especificaciones" className="border p-2 rounded" />
             <input type="text" name="warranty" placeholder="Garantía" className="border p-2 rounded" />
             <input type="url" name="image" placeholder="URL de la imagen" className="border p-2 rounded" />

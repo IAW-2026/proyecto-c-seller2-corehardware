@@ -16,6 +16,7 @@ export default async function ProductList() {
                         <p>Precio: ${product.price}</p>
                         <p>Stock: {product.stock}</p>
                         <p>ID del Vendedor: {product.sellerId}</p>
+                        <p>Descripción: {product.description}</p>
                         <p>Especificaciones: {product.specs}</p>
                         <p>Garantía: {product.warranty}</p>
                         <p>URL de la Imagen: {product.imageUrl}</p>

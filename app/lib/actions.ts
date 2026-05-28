@@ -13,6 +13,7 @@ export type Product = {
     model: string;
     price: string;
     stock: number;
+    description: string;
     specs: string;
     warranty: string;
     imageUrl: string;
@@ -33,6 +34,7 @@ function prismaProductToProduct(prismaProduct: Prisma.ProductModel): Product {
         name: prismaProduct.name,
         brand: prismaProduct.brand,
         model: prismaProduct.model,
+        description: prismaProduct.description,
         specs: prismaProduct.specs,
         warranty: prismaProduct.warranty,
         imageUrl: prismaProduct.image,
@@ -54,6 +56,7 @@ type CreateProductRequestType = {
     model: string;
     price: number;
     stock: number;
+    description: string;
     specs: string;
     warranty: string;
     image: string;
@@ -79,6 +82,7 @@ type EditProductRequestType = {
     model?: string;
     price?: number;
     stock?: number;
+    description?: string;
     specs?: string;
     warranty?: string;
     image?: string;
@@ -115,4 +119,53 @@ export async function getProducts() {
         where: { isDeleted: false },
     });
     return products.map(prismaProductToProduct);
+}
+
+type GetSellerRequestType = { id:number }
+
+function prismaSellerToForeignSeller(prismaSeller:Prisma.SellerModel){
+    return {
+        id: prismaSeller.id,
+        cuit: prismaSeller.CUIT,
+        razon_social: prismaSeller.name,
+        direccion: prismaSeller.address,
+        mail: prismaSeller.email,
+        celular: prismaSeller.phoneNumber,
+        condicion_iva: prismaSeller.VATCondition
+    }
+}
+
+export async function getSeller(validatedData:GetSellerRequestType){
+    const seller = await prisma.seller.findUniqueOrThrow({
+        where: { id: validatedData.id, isDeleted:false},
+    });
+    return prismaSellerToForeignSeller(seller);
+}
+
+type GetProductRequestType = { id: number }
+
+async function prismaProductoToForeignProduct(prismaProduct:Prisma.ProductModel){
+    const seller = await prisma.seller.findUniqueOrThrow({
+        where: { id: prismaProduct.sellerId},
+    });
+    return{
+        id: prismaProduct.id,
+        nombre: prismaProduct.name,
+        vendedor: seller.name,
+        marca: prismaProduct.brand,
+        modelo: prismaProduct.model,
+        precio: prismaProduct.price.toNumber(),
+        descripcion: prismaProduct.description,
+        especificaciones: prismaProduct.specs,
+        garantia: prismaProduct.warranty,
+        imagen: prismaProduct.image,
+        stock: prismaProduct.stock,
+    }
+}
+
+export async function getProduct(validatedData:GetProductRequestType){
+    const product = await prisma.product.findUniqueOrThrow({
+        where: { id: validatedData.id, isDeleted:false},
+    });
+    return prismaProductoToForeignProduct(product);
 }

@@ -20,6 +20,7 @@ model Product {
   brand          String
   model          String
   price          Decimal
+  description    String
   specs          String
   warranty       String
   stock          Int
