@@ -121,6 +121,42 @@ export async function getProducts() {
     return products.map(prismaProductToProduct);
 }
 
+type getProductsFilteredRequestType = {
+    offset?:number,
+    limit?:number,
+    name?: string,
+    brand?: string,
+    seller?: string,
+    hasStock?: boolean,
+}
+
+export async function getProductsFiltered(parameters:getProductsFilteredRequestType){
+    const seller = await prisma.seller.findFirst({
+        where : {name : parameters.seller}
+    })
+    const sellerId = (seller == null )? undefined : seller.id;
+    const greaterThan = parameters.hasStock ? 0 : undefined;
+    const filteredProducts = await prisma.product.findMany({
+        where:{
+            name : parameters.name,
+            brand : parameters.brand,
+            sellerId : sellerId,
+            stock : {
+                gte: greaterThan
+            }
+        },
+        skip: parameters.offset,
+        take: parameters.limit
+    })
+    return filteredProducts.map(prismaProductoToForeignProduct)
+}
+
+export async function getSellers() {
+    const sellers = await prisma.seller.findMany({
+        where: { isDeleted: false },
+    });
+}
+
 type GetSellerRequestType = { id:number }
 
 function prismaSellerToForeignSeller(prismaSeller:Prisma.SellerModel){
@@ -169,3 +205,4 @@ export async function getProduct(validatedData:GetProductRequestType){
     });
     return prismaProductoToForeignProduct(product);
 }
+

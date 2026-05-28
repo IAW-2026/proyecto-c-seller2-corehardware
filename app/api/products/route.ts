@@ -1,8 +1,48 @@
 import { z } from "zod";
-import { createProduct, deleteProduct, editProduct } from "@lib/actions";
+import { createProduct, deleteProduct, editProduct, getProductsFiltered } from "@lib/actions";
 import { headers } from "next/dist/server/request/headers";
 import { NextRequest } from "next/dist/server/web/spec-extension/request";
 import { Prisma } from "@prismaGenerated/client";
+
+
+const getProductsFilteredSchema = z.object({
+    offset: z.coerce.number().int().nonnegative({message: "El offset no puede ser negativo"}).optional(),
+    limit: z.coerce.number().int().nonnegative({message: "El límite no puede ser negativo"}).optional(),
+    name: z.string().optional(),
+    brand: z.string().optional(),
+    seller: z.string().optional(),
+    hasStock: z.boolean().optional()    
+})
+
+export async function GET(request:NextRequest){
+    const { searchParams } = request.nextUrl;
+    const offset = searchParams.get("offset") ?? undefined;
+    const limit = searchParams.get("limit") ?? undefined;
+    const name = searchParams.get("name") ?? undefined;
+    const brand = searchParams.get("brand") ?? undefined;
+    const seller = searchParams.get("seller") ?? undefined;
+    const hasStock = searchParams.get("hasStock") ?? undefined;
+    const validatedParams = getProductsFilteredSchema.safeParse({
+        offset,
+        limit,
+        name,
+        brand,
+        seller,
+        hasStock,
+    });
+
+    if(!validatedParams.success){
+        return new Response(JSON.stringify({ errors: validatedParams.error.flatten().fieldErrors, message: 'Parámetros de consulta inválidos.' }), { status: 404 });
+    }
+
+    try{
+        const products = await getProductsFiltered(validatedParams.data);
+        return new Response(JSON.stringify(products), { status: 200 });
+    } catch(e){
+        console.log(e);
+        return new Response(JSON.stringify({ message: 'Error interno del servidor. No se pudieron obtener los productos.' }), { status: 500 });
+    };
+}
 
 
 const createProductSchema = z.object({
