@@ -2,7 +2,6 @@
 
 import { State } from "@lib/actions";
 import { useActionState, use } from "react";
-import { useSearchParams } from "next/navigation";
 
 type editProductForm ={
     id:number;

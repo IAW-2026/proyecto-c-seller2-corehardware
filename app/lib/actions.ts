@@ -2,8 +2,8 @@
 
 import { Prisma, PrismaClient } from "@prismaGenerated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { z } from "zod";
 import { revalidatePath } from 'next/cache';
+import { redirect } from "next/navigation";
 
 export type Product = {
     id: number;
@@ -210,4 +210,29 @@ export async function validateSellerId(sellerId:number) {
     return await prisma.seller.count({ where: { id:sellerId, isDeleted:false }}) > 0;    
 }
 
+export async function checkUser(clerkId:string|undefined){
+    const seller = clerkId ? await prisma.seller.findFirst({ where: {
+        NOT: { ClerkUserId: null },
+        ClerkUserId: clerkId, 
+        isDeleted : false,
+    }}) : undefined;
+    return seller ? seller.id : undefined;
+}
 
+type createSellerRequestType = {
+    name: string;
+    CUIT: string;
+    address: string;
+    email: string;
+    startOfActivities: Date;
+    phoneNumber: string;
+    VATCondition: string;
+    ClerkUserId: string;
+}
+
+export async function createSeller(validatedData:createSellerRequestType){
+    const seller = await prisma.seller.create({
+        data: validatedData
+    });
+    return `/seller/${seller.id}`;
+}
