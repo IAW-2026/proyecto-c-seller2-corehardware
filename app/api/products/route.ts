@@ -15,6 +15,12 @@ const getProductsFilteredSchema = z.object({
 })
 
 export async function GET(request:NextRequest){
+    const requestHeaders = await headers();
+    const apiKey = requestHeaders.get("X-API-Key");
+    if(apiKey !== process.env.PUBLIC_API_KEY ){
+        return new Response(JSON.stringify({ message: 'Acceso no autorizado' }), { status: 401 });
+    }
+
     const { searchParams } = request.nextUrl;
     const offset = searchParams.get("offset") ?? undefined;
     const limit = searchParams.get("limit") ?? undefined;

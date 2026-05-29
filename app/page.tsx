@@ -1,6 +1,7 @@
 "use client";
 
 import {Show, SignInButton, SignUpButton, UserButton} from '@clerk/nextjs'
+import RoleBasedRedirectButton from './roleBasedRedirectButton';
 
 export default function Home() {
   return (
@@ -11,7 +12,11 @@ export default function Home() {
             Bienvenido a <span className="text-blue-600">CoreHardware</span>
           </h1>
             <Show when="signed-out">
-              <SignInButton />
+              <SignInButton>
+                <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
+                  Sign In
+                </button>
+              </SignInButton>
               <SignUpButton>
                 <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
                   Sign Up
@@ -20,9 +25,7 @@ export default function Home() {
             </Show>
             <Show when="signed-in">
               <UserButton />
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" onClick={() => window.location.href = "/dashboard"}>
-                Ir al Dashboard de administración
-              </button>
+              <RoleBasedRedirectButton />
             </Show>
         </div>
       </main>

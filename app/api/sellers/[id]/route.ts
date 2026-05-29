@@ -12,7 +12,7 @@ export async function GET(request: NextRequest, {params}: {params: Promise<{ id:
     const requestHeaders = await headers();
     const apiKey = requestHeaders.get("X-API-Key");
     if(apiKey !== process.env.PUBLIC_API_KEY ){
-        //Response for wrong API KEY not yet decided
+        return new Response(JSON.stringify({ message: 'Acceso no autorizado' }), { status: 401 });
     } else{
 
         try{
