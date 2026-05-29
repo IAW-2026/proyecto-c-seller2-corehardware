@@ -206,3 +206,8 @@ export async function getProduct(validatedData:GetProductRequestType){
     return prismaProductoToForeignProduct(product);
 }
 
+export async function validateSellerId(sellerId:number) {
+    return await prisma.seller.count({ where: { id:sellerId, isDeleted:false }}) > 0;    
+}
+
+

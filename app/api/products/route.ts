@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createProduct, deleteProduct, editProduct, getProductsFiltered } from "@lib/actions";
-import { headers } from "next/dist/server/request/headers";
-import { NextRequest } from "next/dist/server/web/spec-extension/request";
+import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 import { Prisma } from "@prismaGenerated/client";
 
 
@@ -38,7 +38,7 @@ export async function GET(request:NextRequest){
     });
 
     if(!validatedParams.success){
-        return new Response(JSON.stringify({ errors: validatedParams.error.flatten().fieldErrors, message: 'Parámetros de consulta inválidos.' }), { status: 404 });
+        return new Response(JSON.stringify({ message: 'Datos de entrada inválidos. No se pudo crear la venta. Errores: ' + JSON.stringify(validatedParams.error.flatten().fieldErrors) }), { status: 400 });
     }
 
     try{

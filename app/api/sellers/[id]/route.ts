@@ -2,13 +2,17 @@
 
 import { z } from "zod";
 import { getSeller } from "@/app/lib/actions";
-import { headers } from "next/dist/server/request/headers";
-import { NextRequest } from "next/dist/server/web/spec-extension/request";
-import { Prisma } from "@prismaGenerated/client";
+import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest, {params}: {params: Promise<{ id: string }>}) {
-    const { id } = await params;
-    const sellerId = Number(id);
+    const parameters = await params;
+    const validatedParams = z.object({id: z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" })}).safeParse(parameters);
+    if (!validatedParams.success) {
+        return new Response(JSON.stringify({ message: 'Datos de entrada inválidos. No se pudo crear la venta. Errores: ' + JSON.stringify(validatedParams.error.flatten().fieldErrors) }), { status: 400 });
+    } 
+    const { id } = validatedParams.data;
+    
     const requestHeaders = await headers();
     const apiKey = requestHeaders.get("X-API-Key");
     if(apiKey !== process.env.PUBLIC_API_KEY ){
@@ -16,7 +20,7 @@ export async function GET(request: NextRequest, {params}: {params: Promise<{ id:
     } else{
 
         try{
-            const foreignSeller = await getSeller({ id: sellerId }) 
+            const foreignSeller = await getSeller({ id: id }) 
             return new Response(JSON.stringify(foreignSeller), { status: 200 });        
         } catch(e){
             return new Response(JSON.stringify({message:"No se pudo encontrar al vendedor"}), { status: 404 })    
