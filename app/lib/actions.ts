@@ -3,7 +3,6 @@
 import { Prisma, PrismaClient } from "@prismaGenerated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { revalidatePath } from 'next/cache';
-import { redirect } from "next/navigation";
 
 export type Product = {
     id: number;
@@ -236,3 +235,11 @@ export async function createSeller(validatedData:createSellerRequestType){
     });
     return `/seller/${seller.id}`;
 }
+
+export async function getProductsBySeller(sellerId:number){
+    const products = await prisma.product.findMany({
+        where: { isDeleted: false, sellerId: sellerId },
+    });
+    return products.map(prismaProductToProduct); 
+}
+
