@@ -7,7 +7,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest, {params}: {params: Promise<{ id: string }>}) {
     const parameters = await params;
-    const validatedParams = z.object({id: z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" })}).safeParse(parameters);
+    const validatedParams = z.object({id: z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" })}).safeParse(parameters);
     if (!validatedParams.success) {
         return new Response(JSON.stringify({ message: 'Datos de entrada inválidos. No se pudo crear la venta. Errores: ' + JSON.stringify(validatedParams.error.flatten().fieldErrors) }), { status: 400 });
     } 
@@ -19,8 +19,8 @@ export async function GET(request: NextRequest, {params}: {params: Promise<{ id:
     } else{
 
         try{
-            const foreignSeller = await getProduct({ id: id }) 
-            return new Response(JSON.stringify(foreignSeller), { status: 200 });        
+            const foreignProduct = await getProduct({ id: id }) 
+            return new Response(JSON.stringify(foreignProduct), { status: 200 });        
         } catch(e){
             return new Response(JSON.stringify({message:"No se pudo encontrar el producto"}), { status: 404 })    
         }    

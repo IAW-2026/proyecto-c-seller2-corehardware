@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect} from "react";
 import { Product } from "@/app/lib/actions";
+import { z } from 'zod'
 
 export default function DeleteProduct({params}: {params: Promise<{ id: string }>}) {
-    const productId = Number(use(params).id);
     const emptyProduct: Product = {
         id : 0,
         sellerId : 0,
@@ -29,7 +29,7 @@ export default function DeleteProduct({params}: {params: Promise<{ id: string }>
                     "Content-Type": "application/json",
                     "X-API-Key": process.env.NEXT_PUBLIC_PRIVATE_API_KEY || "",
                 },
-                body: JSON.stringify({ id: productId}),
+                body: JSON.stringify({ id: (await params).id}),
             }).then((res) => res.json());
             if(deletedProduct.message){
                 setErrorMessage(deletedProduct.message);
@@ -44,7 +44,7 @@ export default function DeleteProduct({params}: {params: Promise<{ id: string }>
     },[])
     if(loading) return( <h1 className="text-3xl font-bold mb-4"> Pedido en proceso...</h1> )
     else{
-    if(errorMessage!=="") return( <p className="text-red-600"> Error: {errorMessage}. Con ID de producto: {productId} </p> )
+    if(errorMessage!=="") return( <p className="text-red-600"> Error: {errorMessage}. Con ID de producto: {product.id} </p> )
     else 
         return(
             <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">

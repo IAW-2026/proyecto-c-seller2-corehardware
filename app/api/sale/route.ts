@@ -1,4 +1,4 @@
-import { validateSellerId } from "@/app/lib/actions";
+import { validateSellerId, getValidProductIdsFromSeller, createSale } from "@/app/lib/actions";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from 'zod';
@@ -24,18 +24,21 @@ export async function POST(request:NextRequest) {
     if (!validatedData.success) {
         return new Response(JSON.stringify({ message: 'Datos de entrada inválidos. No se pudo crear la venta. Errores: ' + JSON.stringify(validatedData.error.flatten().fieldErrors) }), { status: 400 });
     }  
-    const {id, fecha, comprador_id, vendedor_id, productos, monto} = validatedData.data;
+    const { fecha, vendedor_id, productos, monto} = validatedData.data;
 
     try{
 
-    if(!validateSellerId(vendedor_id)){
-        return new Response(JSON.stringify({ message: "El vendedor con id " + vendedor_id + " no existe." }), { status: 400 });    
+    if(!(await validateSellerId(vendedor_id))){
+        return new Response(JSON.stringify({ message: `El vendedor con id ${vendedor_id} no existe.` }), { status: 400 });    
     }
 
-    
+    const productIdsFromSeller = await getValidProductIdsFromSeller(vendedor_id);
+    const invalidProductId = productIdsFromSeller.find(id => !productIdsFromSeller.includes(id));
+    if( invalidProductId ){
+        return new Response(JSON.stringify({ message: `El producto con id ${ invalidProductId } no existe o no corresponde al vendedor con id ${vendedor_id} especificado en el pedido`}));
+    }
 
-
-    // Creación de la venta
+    await createSale( {date:fecha, sellerId:vendedor_id, productIds:productos, price:monto} );
 
     } catch(err){
         return new Response(JSON.stringify({message: "Error del servidor, no se pudo crear venta."}),{ status:500 });
@@ -52,5 +55,5 @@ export async function POST(request:NextRequest) {
     if(shipment.message){
         return new Response(JSON.stringify({message: shipment.message}) , { status: response.status })
     }
-    return new Response(JSON.stringify(data), { status: 201})
+    return new Response(JSON.stringify(validatedData.data), { status: 201})
 }

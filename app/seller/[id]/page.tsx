@@ -6,8 +6,7 @@ import { getSellerName } from "@lib/actions";
 
 export default async function PersonalizedSellerPage( {params}: {params: Promise<{ id: string }>}){
     const {id} =await params;
-    const sellerId = Number(id);
-    const sellerName = await getSellerName(sellerId);
+    const sellerName = await getSellerName(id);
 
     return (
         <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">

@@ -3,6 +3,8 @@
 import { Prisma, PrismaClient } from "@prismaGenerated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { revalidatePath } from 'next/cache';
+import { z } from "zod";
+
 
 export type Product = {
     id: number;
@@ -149,7 +151,7 @@ export async function getProductsFiltered(parameters:getProductsFilteredRequestT
         skip: parameters.offset,
         take: parameters.limit
     })
-    return filteredProducts.map(prismaProductoToForeignProduct)
+    return await Promise.all(filteredProducts.map(prismaProductoToForeignProduct));
 }
 
 export type SellerDetails = {
@@ -241,18 +243,22 @@ export async function getProduct(validatedData:GetProductRequestType){
     const product = await prisma.product.findUniqueOrThrow({
         where: { id: validatedData.id, isDeleted:false},
     });
-    return prismaProductoToForeignProduct(product);
+    return await prismaProductoToForeignProduct(product);
 }
 
-export async function getSellerName(sellerId:number) {
+
+
+export async function getSellerName(id : string) {
+    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" });
+    const sellerId = coercionSchema.parse(id);
     const seller = await prisma.seller.findUniqueOrThrow({
         where: { id: sellerId, isDeleted:false},
     });
     return seller.name;
 }
 
-export async function validateSellerId(sellerId:number) {
-    return await prisma.seller.count({ where: { id:sellerId, isDeleted:false }}) > 0;    
+export async function validateSellerId(id : number) {
+    return await prisma.seller.count({ where: { id:id, isDeleted:false }}) > 0;    
 }
 
 export async function checkUser(clerkId:string|undefined){
@@ -280,6 +286,51 @@ export async function createSeller(validatedData:createSellerRequestType){
         data: validatedData
     });
     return `/seller/${seller.id}`;
+}
+
+type createSaleRequestType = {
+    date: Date,
+    sellerId: number,
+    price: number,
+    productIds: number[],
+}
+
+export async function createSale( validatedData: createSaleRequestType){
+    const saleId = (await prisma.sale.create({
+        data:{
+            date: validatedData.date,
+            totalPrice: validatedData.price,
+            seller:{
+                connect: { id: validatedData.sellerId}
+            }
+        }
+    })).id;
+    validatedData.productIds.forEach( (id) => addProductToSale(saleId,id))
+}
+
+async function addProductToSale(saleId:number, productId:number){
+    await prisma.productOnSale.upsert({
+        where:{
+            saleId_productId:{
+                saleId:saleId,
+                productId:productId,
+            }
+        },
+        update:{
+            productAmount : {
+                increment:1
+            }
+        },
+        create: {
+            saleId:saleId,
+            productId:productId,
+            productAmount:1
+        }
+    })
+}
+
+export async function getValidProductIdsFromSeller(sellerId:number){
+    return (await prisma.product.findMany({where:{sellerId:sellerId, isDeleted:false}})).map(product => product.id); 
 }
 
 

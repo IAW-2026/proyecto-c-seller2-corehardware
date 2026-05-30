@@ -1,25 +1,11 @@
 "use client";
 
 import { State } from "@lib/actions";
-import { useActionState, use } from "react";
+import { useActionState } from "react";
 
-type editProductForm ={
-    id:number;
-    name?: string;
-    sellerId?: number;
-    brand?: string;
-    model?: string;
-    price?: number;
-    stock?: number;
-    description?: string;
-    specs?: string;
-    warranty?: string;
-    image?: string;
-}
 
 
 export default function EditProductForm({params}: {params: Promise<{ id: string }>}) {
-    const productId = Number(use(params).id);
     const initialState: State = {
         product: null,
         loading: false,
@@ -29,8 +15,8 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
     const createProductAction = async (previousState: State, formData: FormData) => {
         previousState.loading = true;
         const entries = Object.fromEntries(formData.entries());
-        const createProductData: editProductForm = {
-            id: productId as number,
+        const createProductData = {
+            id: (await params).id,
             name: entries.name ? entries.name as string : undefined,
             sellerId: entries.sellerId ? Number(entries.sellerId) : undefined,
             brand: entries.brand ? entries.brand as string : undefined,
