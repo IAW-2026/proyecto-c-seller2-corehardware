@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkUser } from "../lib/actions";
-import SellerCreationForm from "./sellerCreationForm";
+import SellerCreationForm from "@ui/seller/sellerCreationForm";
 
 enum SellerStatus { Unchecked, CheckedTrue, CheckedFalse}
 

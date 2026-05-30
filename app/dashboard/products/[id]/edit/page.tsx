@@ -1,6 +1,6 @@
 "use client";
 
-import EditProductForm from "./editProductForm";
+import EditProductForm from "@ui/products/editProductForm";
 
 
 export default function Home({params}: {params: Promise<{ id: string }>}) {

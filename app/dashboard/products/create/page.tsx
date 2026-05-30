@@ -1,6 +1,6 @@
 "use client";
 
-import CreateProductForm from "./createProductForm";
+import CreateProductForm from "@ui/products/createProductForm";
 
 
 export default function Home() {

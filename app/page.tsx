@@ -1,7 +1,7 @@
 "use client";
 
 import {Show, SignInButton, SignUpButton, UserButton} from '@clerk/nextjs'
-import RoleBasedRedirectButton from './roleBasedRedirectButton';
+import RoleBasedRedirectButton from '@ui/buttons/roleBasedRedirectButton';
 
 export default function Home() {
   return (

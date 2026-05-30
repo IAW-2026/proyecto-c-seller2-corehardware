@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ProductList from "./productList";
+import ProductList from "@ui/products/productList";
 
 export default function Home() {
     return (
