@@ -12,6 +12,9 @@ export default function AdminDashboard() {
           <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" onClick={() => window.location.href = "/dashboard/products"}>
             Mostrar Productos
           </button>
+          <button className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors" onClick={() => window.location.href = "/dashboard/sellers"}>
+            Mostrar Vendedores
+          </button>
         </div>
       </main>
     </div>

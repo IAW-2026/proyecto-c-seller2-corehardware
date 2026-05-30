@@ -1,5 +1,5 @@
 "use client";
-import DeleteProduct from "@ui/products/deleteProduct"
+import DeleteProduct from "@/app/ui/products/deleteProduct"
 
 export default function Home({params}: {params: Promise<{ id: string }>}) {
     return(

@@ -113,9 +113,11 @@ export async function deleteProduct(validatedData:DeleteProductRequestType) {
     return prismaProductToProduct(product);
 }
 
-export async function getProducts() {
+export async function getProducts(limit:number, page:number, sellerID?:number) {
     const products = await prisma.product.findMany({
-        where: { isDeleted: false },
+        where: { isDeleted: false, sellerId: sellerID },
+        take: limit,
+        skip: (page - 1) * limit
     });
     return products.map(prismaProductToProduct);
 }
@@ -150,10 +152,47 @@ export async function getProductsFiltered(parameters:getProductsFilteredRequestT
     return filteredProducts.map(prismaProductoToForeignProduct)
 }
 
-export async function getSellers() {
+export type SellerDetails = {
+    id: number;
+    name: string;
+    CUIT: string;
+    address: string;
+    email: string;
+    startOfActivities: string;
+    phoneNumber: string;
+    VATCondition: string;
+}
+
+function prismaSellerToSeller(prismaSeller: Prisma.SellerModel) {
+    return {
+        id: prismaSeller.id,
+        name: prismaSeller.name,
+        CUIT: prismaSeller.CUIT,
+        address: prismaSeller.address,
+        email: prismaSeller.email,
+        startOfActivities: prismaSeller.startOfActivities.toDateString(),
+        phoneNumber: prismaSeller.phoneNumber,
+        VATCondition: prismaSeller.VATCondition,
+    }
+}
+
+export async function getSellerDetails(sellerId:number) {
+    const seller = await prisma.seller.findUniqueOrThrow({
+        where: { id: sellerId, isDeleted:false },
+    });
+    return prismaSellerToSeller(seller);
+}
+
+export type SellerNameId = {
+    id: number;
+    name: string;
+}
+
+export async function getSellerNamesIds() {
     const sellers = await prisma.seller.findMany({
         where: { isDeleted: false },
     });
+    return sellers.map((seller) => ({ name: seller.name, id: seller.id }));
 }
 
 type GetSellerRequestType = { id:number }
@@ -205,6 +244,13 @@ export async function getProduct(validatedData:GetProductRequestType){
     return prismaProductoToForeignProduct(product);
 }
 
+export async function getSellerName(sellerId:number) {
+    const seller = await prisma.seller.findUniqueOrThrow({
+        where: { id: sellerId, isDeleted:false},
+    });
+    return seller.name;
+}
+
 export async function validateSellerId(sellerId:number) {
     return await prisma.seller.count({ where: { id:sellerId, isDeleted:false }}) > 0;    
 }
@@ -236,10 +282,4 @@ export async function createSeller(validatedData:createSellerRequestType){
     return `/seller/${seller.id}`;
 }
 
-export async function getProductsBySeller(sellerId:number){
-    const products = await prisma.product.findMany({
-        where: { isDeleted: false, sellerId: sellerId },
-    });
-    return products.map(prismaProductToProduct); 
-}
 
