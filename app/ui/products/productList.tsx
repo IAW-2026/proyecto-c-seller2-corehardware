@@ -49,7 +49,7 @@ export default function ProductList({sellerId = undefined, onDashboard = false}:
                                 </Link>
                             </>
                         )}
-                        {sellerId && (
+                        {!onDashboard && (
                             <Link href={`/seller/${sellerId}/products/${product.id}`}>
                                 <button className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-gray-700 transition-colors">
                                     Ver Detalles
