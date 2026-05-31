@@ -1,6 +1,7 @@
  import { getProductDetails, Product } from "@/app/lib/actions";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import AddStockForm from '@ui/products/addStockForm'
 
 export default async function ProductPage({ params }: { params: { id: string; productId: string } }) {
   const { id, productId } = await params;
@@ -28,70 +29,73 @@ export default async function ProductPage({ params }: { params: { id: string; pr
             Volver a la Página del Vendedor
           </Link>
         </header>
+        <div className="grid gap-3">    
+            <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
+            <section className="space-y-6">
+                <div className="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900">
+                <img src={product.imageUrl} alt={product.name} className="h-[420px] w-full object-cover" />
+                </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
-          <section className="space-y-6">
-            <div className="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900">
-              <img src={product.imageUrl} alt={product.name} className="h-[420px] w-full object-cover" />
+                <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Descripción</h2>
+                <p className="mt-4 text-base leading-7 text-gray-700 dark:text-zinc-300">{product.description}</p>
+                </div>
+            </section>
+
+            <aside className="space-y-6">
+                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Información rápida</h2>
+                <dl className="grid gap-3">
+                    <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
+                    <dt className="text-sm text-zinc-500">Marca</dt>
+                    <dd className="text-lg font-semibold text-gray-900 dark:text-white">{product.brand}</dd>
+                    </div>
+                    <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
+                    <dt className="text-sm text-zinc-500">Modelo</dt>
+                    <dd className="text-lg font-semibold text-gray-900 dark:text-white">{product.model}</dd>
+                    </div>
+                    <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
+                    <dt className="text-sm text-zinc-500">Precio</dt>
+                    <dd className="text-lg font-semibold text-gray-900 dark:text-white">${product.price}</dd>
+                    </div>
+                    <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
+                    <dt className="text-sm text-zinc-500">Stock</dt>
+                    <dd className="text-lg font-semibold text-gray-900 dark:text-white">{product.stock}</dd>
+                    </div>
+                    <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
+                    <dt className="text-sm text-zinc-500">Especificaciones</dt>
+                    <dd className="text-base text-gray-900 dark:text-white">{product.specs}</dd>
+                    </div>
+                    <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
+                    <dt className="text-sm text-zinc-500">Garantía</dt>
+                    <dd className="text-base text-gray-900 dark:text-white">{product.warranty}</dd>
+                    </div>
+                </dl>
+                </div>
+            </aside>
             </div>
-
             <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Descripción</h2>
-              <p className="mt-4 text-base leading-7 text-gray-700 dark:text-zinc-300">{product.description}</p>
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Acciones</h2>
+                <div className="flex gap-21">
+                    <AddStockForm productId={productId} initialStock={product.stock} />
+                    <Link href={`/seller/${id}/products/${productId}/change-price`} >
+                        <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
+                            Cambiar precio
+                        </button>
+                    </Link>
+                    <Link href={`/seller/${id}/products/${productId}/change-description`} >
+                        <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
+                            Cambiar descripción
+                        </button>
+                    </Link>
+                    <Link href={`/seller/${id}/products/${productId}/change-image`} >
+                        <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
+                            Cambiar imagen
+                        </button>
+                    </Link>
+                </div>
+                </div>
             </div>
-          </section>
-
-          <aside className="space-y-6">
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Información rápida</h2>
-              <dl className="grid gap-3">
-                <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
-                  <dt className="text-sm text-zinc-500">Marca</dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">{product.brand}</dd>
-                </div>
-                <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
-                  <dt className="text-sm text-zinc-500">Modelo</dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">{product.model}</dd>
-                </div>
-                <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
-                  <dt className="text-sm text-zinc-500">Precio</dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">${product.price}</dd>
-                </div>
-                <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
-                  <dt className="text-sm text-zinc-500">Stock</dt>
-                  <dd className="text-lg font-semibold text-gray-900 dark:text-white">{product.stock}</dd>
-                </div>
-                <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
-                  <dt className="text-sm text-zinc-500">Especificaciones</dt>
-                  <dd className="text-base text-gray-900 dark:text-white">{product.specs}</dd>
-                </div>
-                <div className="flex flex-col gap-1 rounded-lg bg-white p-3 dark:bg-zinc-950">
-                  <dt className="text-sm text-zinc-500">Garantía</dt>
-                  <dd className="text-base text-gray-900 dark:text-white">{product.warranty}</dd>
-                </div>
-              </dl>
-            </div>
-
-            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Acciones</h2>
-              <div className="grid gap-3">
-                <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
-                  Agregar stock
-                </button>
-                <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
-                  Cambiar precio
-                </button>
-                <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
-                  Cambiar descripción
-                </button>
-                <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
-                  Cambiar imagen
-                </button>
-              </div>
-            </div>
-          </aside>
-        </div>
-
       </main>
     </div>
   );

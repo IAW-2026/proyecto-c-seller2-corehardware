@@ -11,9 +11,9 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const seller1 = await prisma.seller.create({
     data: {
-      name: "user1",
+      name: "seller1",
       CUIT: "20-12345678-9",
-      email: "user1+clerk_test@example.com",
+      email: "seller1+clerk_test@example.com",
       phoneNumber: "1234567890",
       address: "123 Main St, City, Country",
       startOfActivities: new Date("2020-01-01"),
@@ -23,14 +23,14 @@ async function main() {
   await prisma.seller.update({
     where: { id: seller1.id },
     data: {
-      ClerkUserId: "user_3ENSQk9I40xMFfkAK2otqcVFQSs",
+      ClerkUserId: "user_3EV7FR0knYFOxA7XZ58CZcbJzEP",
     },
   });
   const seller2 = await prisma.seller.create({
     data: {
-      name: "user2",
+      name: "seller2",
       CUIT: "27-98765432-1",
-      email: "user2+clerk_test@example.com",
+      email: "seller2+clerk_test@example.com",
       phoneNumber: "0987654321",
       address: "456 Elm St, City, Country",
       startOfActivities: new Date("2021-06-15"),
@@ -40,7 +40,7 @@ async function main() {
   await prisma.seller.update({
     where: { id: seller2.id },
     data: {
-      ClerkUserId: "user_3ENTKixn8eNkkX6HTLs11FebqfL",
+      ClerkUserId: "user_3EV7PvV3NYMAOYWp9CMBwKvymTZ",
     },
   });
 
@@ -57,7 +57,7 @@ async function main() {
         description: "Description for Product 1",
         specs : "Specs for Product 1",
         warranty : "Warranty for Product 1",
-        image : "https://example.com/product1.jpg",
+        image : "https://images.unsplash.com/photo-1577375729152-4c8b5fcda381?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     }
   });
   const product2 = await prisma.product.create({
@@ -73,7 +73,7 @@ async function main() {
         description: "Description for Product 2",
         specs : "Specs for Product 2",
         warranty : "Warranty for Product 2",
-        image : "https://example.com/product2.jpg",
+        image : "https://images.unsplash.com/photo-1602837385569-08ac19ec83af?q=80&w=326&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     }
   });
   const product3 = await prisma.product.create({
@@ -89,7 +89,7 @@ async function main() {
         description: "Description for Product 3",
         specs : "Specs for Product 3",
         warranty : "Warranty for Product 3",
-        image : "https://example.com/product3.jpg",
+        image : "https://images.unsplash.com/photo-1591238372408-8b98667c0460?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     }
   });
   const product4 = await prisma.product.create({
@@ -105,7 +105,7 @@ async function main() {
         description: "Description for Product 4",
         specs : "Specs for Product 4",
         warranty : "Warranty for Product 4",
-        image : "https://example.com/product4.jpg",
+        image : "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     }
   });
   const sale1 = await createSale({

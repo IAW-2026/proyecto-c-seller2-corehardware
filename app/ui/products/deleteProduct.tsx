@@ -2,7 +2,6 @@
 
 import { useState, useEffect} from "react";
 import { Product } from "@/app/lib/actions";
-import { z } from 'zod'
 
 export default function DeleteProduct({params}: {params: Promise<{ id: string }>}) {
     const emptyProduct: Product = {

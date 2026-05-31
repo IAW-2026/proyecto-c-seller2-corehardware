@@ -20,7 +20,7 @@ export default function RoleBasedRedirectButton(){
     if(role === "seller"){
         return (
         <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-pink-500 text-white rounded-full shadow-lg hover:scale-[1.01] transition-transform" onClick={() => window.location.href = "/seller"}>
-            Ir a la página de Vendedores
+            Ir a la página de Vendedor
         </button>
         )    
     }

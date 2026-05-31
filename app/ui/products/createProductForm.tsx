@@ -101,7 +101,7 @@ export default function CreateProductForm({sellerId = undefined}: {sellerId?: nu
             </div>
             <div className="flex flex-col gap-2">
                 <label htmlFor="price" className="text-lg font-medium">Precio</label>
-                <input id="price" type="number" step="0.01" name="price" placeholder="0.00" className="w-full border px-4 py-2 rounded text-lg" required />
+                <input id="price" type="number" step="0.01" name="price" placeholder="0.00" className="no-spinner w-full border px-4 py-2 rounded text-lg" required />
             </div>
             <div className="flex flex-col gap-2">
                 <label htmlFor="stock" className="text-lg font-medium">Stock</label>

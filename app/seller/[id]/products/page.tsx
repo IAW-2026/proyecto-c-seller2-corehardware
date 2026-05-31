@@ -15,7 +15,7 @@ export default function SellerProducts({params}: {params: Promise<{ id: string }
                     </h1>
                     <Link href={`/seller/${id}/products/create`}>
                         <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                            Crear Producto
+                            Publicar Producto
                         </button>
                     </Link>
                     <ProductList sellerId={id} />

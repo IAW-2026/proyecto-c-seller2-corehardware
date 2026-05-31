@@ -16,6 +16,9 @@ export default async function PersonalizedSellerPage( {params}: {params: Promise
                     <Link href={`/seller/${id}/products/`}>
                         <button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">Gestionar Productos</button>
                     </Link>
+                    <Link href={`/seller/${id}/delete-account/`}>
+                        <button className="px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors duration-200">Borrar Cuenta</button>
+                    </Link>
                 </div>
             </main>
         </div>

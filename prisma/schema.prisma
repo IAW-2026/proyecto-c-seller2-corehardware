@@ -31,10 +31,10 @@ model Product {
 
 model Seller {
   id                Int       @id @default(autoincrement())
-  CUIT              String    @unique
+  CUIT              String    
   name              String
   address           String
-  email             String    @unique
+  email             String    
   phoneNumber       String
   startOfActivities DateTime
   VATCondition      String

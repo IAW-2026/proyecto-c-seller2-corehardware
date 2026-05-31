@@ -7,7 +7,7 @@ const isAdminRoute = createRouteMatcher([
 ])
 
 const isPublicRoute = createRouteMatcher([
-    '/sign-in(.*)', '/sign-up(.*)', '/', '/api(.*)'
+    '/sign-in(.*)', '/sign-up(.*)', '/', '/api(.*)', '/deleted-account(.*)'
 ])
 
 const isSellerRoute = createRouteMatcher([

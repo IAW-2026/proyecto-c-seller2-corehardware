@@ -4,6 +4,8 @@ import { Prisma, PrismaClient } from "@prismaGenerated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { revalidatePath } from 'next/cache';
 import { z } from "zod";
+import { redirect } from "next/navigation";
+import { clerkClient, auth } from "@clerk/nextjs/server";
 
 
 export type Product = {
@@ -135,7 +137,7 @@ type getProductsFilteredRequestType = {
 
 export async function getProductsFiltered(parameters:getProductsFilteredRequestType){
     const seller = await prisma.seller.findFirst({
-        where : {name : parameters.seller}
+        where : {name : parameters.seller, isDeleted: false}
     })
     const sellerId = (seller == null )? undefined : seller.id;
     const greaterThan = parameters.hasStock ? 0 : undefined;
@@ -146,7 +148,8 @@ export async function getProductsFiltered(parameters:getProductsFilteredRequestT
             sellerId : sellerId,
             stock : {
                 gte: greaterThan
-            }
+            },
+            isDeleted:false,
         },
         skip: parameters.offset,
         take: parameters.limit
@@ -350,6 +353,91 @@ export async function getProductDetails(id:string){
         where: { id: productId, isDeleted:false},
     });
     return prismaProductToProduct(product);
+}
+
+export async function addStock(id: string, stock: number){
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
+    const coercionSchemaStock = z.coerce.number().int().positive({ message: "El incremento en el stock del producto debe ser un entero positivo" });
+    const productId = coercionSchemaId.parse(id);
+    const addedStock = coercionSchemaStock.parse(stock);
+    try{
+    const product = await prisma.product.update({
+        where: {id : productId, isDeleted:false},
+        data: {
+            stock :{
+                increment: addedStock,
+            },
+        },
+    })
+    revalidatePath(`/seller/${product.sellerId}/products/${product.id}`); 
+    } catch(err){
+        throw new Error("Error del servidor, no se pudo actualizar el stock")
+    }
+}
+
+export async function changePrice(id: string, price: number){
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
+    const coercionSchemaPrice = z.coerce.number().gt(0, { message: "El precio debe ser mayor que 0" });
+    const productId = coercionSchemaId.parse(id);
+    const changedPrice = coercionSchemaPrice.parse(price);
+    try{
+    const product = await prisma.product.update({
+        where: {id : productId, isDeleted : false},
+        data: {
+            price : changedPrice
+        },
+    })
+    revalidatePath(`/seller/${product.sellerId}/products/${product.id}`); 
+    } catch(err){
+        throw new Error("Error del servidor, no se pudo actualizar el stock")
+    }
+}
+
+export async function getSale(id: string){
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID de la venta debe ser un entero positivo" });
+    const saleId = coercionSchemaId.parse(id);
+    const sale = await prisma.sale.findUniqueOrThrow({
+        where: {id: saleId},
+    })    
+}
+
+export async function getSales(){
+    return await prisma.sale.findMany({
+        
+    })
+}
+
+export async function deleteSeller(id:string){
+    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" });
+    const sellerId = coercionSchema.parse(id);
+    const client = await clerkClient();
+    const authData = await auth();
+    if(authData.sessionId){
+        await client.sessions.revokeSession(authData.sessionId);
+    }
+    revalidatePath("/");
+    if(authData.userId){
+        await client.users.deleteUser(authData.userId);
+        revalidatePath("/");
+        await prisma.seller.update({
+        where:{
+            id:sellerId,
+            },
+            data: {isDeleted: true},
+        });
+        await prisma.product.updateMany({
+            where: {sellerId:sellerId},
+            data: {isDeleted:true},
+        }); 
+        await prisma.sale.updateMany({
+            where: {sellerId:sellerId},
+            data: {isDeleted:true},
+        });
+        revalidatePath("/");
+        revalidatePath("/dashboard/sellers");
+        revalidatePath("/seller");
+    }
+    redirect('/deleted-account');
 }
 
 
