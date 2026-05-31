@@ -41,7 +41,11 @@ export default function DeleteProduct({params}: {params: Promise<{ id: string }>
             }       
             deleteProduct();
     },[])
-    if(loading) return( <h1 className="text-3xl font-bold mb-4"> Pedido en proceso...</h1> )
+    if(loading) return( 
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+            <h1 className="text-3xl font-bold mb-4"> Eliminando producto...</h1> 
+        </div>
+    )
     else{
     if(errorMessage!=="") return( <p className="text-red-600"> Error: {errorMessage}. Con ID de producto: {product.id} </p> )
     else 

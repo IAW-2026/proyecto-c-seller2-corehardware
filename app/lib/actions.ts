@@ -431,20 +431,72 @@ export async function changeImageLink(id: string, imageLink: string){
     }
 }
 
-export async function getSale(id: string){
-    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID de la venta debe ser un entero positivo" });
-    const saleId = coercionSchemaId.parse(id);
-    const sale = await prisma.sale.findUniqueOrThrow({
-        where: {id: saleId},
-    })    
+export type SaleDetails = {
+    id: number;
+    date: Date;
+    totalPrice: string;
+    sellerName: string;
+    products: string;
+}
+
+function prismaSaleToSaleDetails(prismaSale: { id: number; date: Date; totalPrice: Prisma.Decimal }, sellerName: string, productsOnSale: { product: { name: string; }; productId: number; productAmount: number; }[]): SaleDetails {
+    const products = productsOnSale.map((pos) => ` "${pos.product.name}" X ${pos.productAmount}`).join(", ");
+    return {
+        id: prismaSale.id,
+        date: prismaSale.date,
+        totalPrice: prismaSale.totalPrice.toString(),
+        sellerName: sellerName,
+        products: products
+    };
+}
+
+export async function getSales(sellerId?: string): Promise<SaleDetails[]> {
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional();
+    const validSellerId = coercionSchemaId.parse(sellerId);
+    const salesWithSeller = await prisma.sale.findMany({
+        where: { sellerId: validSellerId, isDeleted:false },
+        select: {
+            id: true,
+            date: true,
+            totalPrice: true,
+            seller: {
+                select: {
+                    name: true,
+                }
+            }
+        }
+    });
+    return await Promise.all(salesWithSeller.map(async (sale) => {
+        const productsOnSale = await prisma.productOnSale.findMany({
+            where: { saleId: sale.id },
+            select: {
+                productId: true,
+                productAmount: true,
+                product: {
+                    select: {
+                        name: true,
+                    }
+                }
+            }
+        });
+        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+    }));
+}
+
+export async function getTotalSalesValue(sellerId?: string): Promise<string> {
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional();
+    const validSellerId = coercionSchemaId.parse(sellerId);
+    const totalSalesValue = await prisma.sale.aggregate({
+        where: { sellerId: validSellerId, isDeleted:false },
+        _sum: {
+            totalPrice: true,
+        }
+    });
+    return totalSalesValue._sum.totalPrice ? totalSalesValue._sum.totalPrice.toString() : "0";
 }
 
 
-export async function getSales(){
-    return await prisma.sale.findMany({
-        
-    })
-}
+
 
 export async function deleteSeller(id:string){
     const coercionSchema = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" });

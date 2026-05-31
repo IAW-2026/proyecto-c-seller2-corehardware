@@ -45,7 +45,7 @@ export default function changeDescriptionForm({ productId, initialDescription }:
       <form action={handleSubmit} className="grid gap-4">
           <textarea
             name="newDescription"
-            defaultValue={"Nueva descripción"}
+            placeholder={"Nueva descripción"}
             className="w-full h-32 p-3 text-left align-top resize-none border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-blue-500 dark:focus:ring-blue-900"
           />
         <button

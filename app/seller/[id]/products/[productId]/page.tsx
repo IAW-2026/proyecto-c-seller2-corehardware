@@ -38,12 +38,12 @@ export default async function ProductPage({ params }: { params: { id: string; pr
             
             <section className="space-y-6 min-w-0">
                 <div className="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900">
-                <img src={product.imageUrl} alt={product.name} className="h-[380px] w-full object-cover" />
+                <img src={product.imageUrl} alt={product.name} className="h-95 w-full object-cover" />
                 </div>
 
-                <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 min-h-[180px] lg:min-h-[200px] overflow-hidden">
+                <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 min-h-45 lg:min-h-50 overflow-hidden">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Descripción</h2>
-                <p className="mt-4 text-base leading-7 text-gray-700 dark:text-zinc-300 break-words whitespace-normal">{product.description}</p>
+                <p className="mt-4 text-base leading-7 text-gray-700 dark:text-zinc-300 wrap-break-word whitespace-normal">{product.description}</p>
                 </div>
             </section>
 

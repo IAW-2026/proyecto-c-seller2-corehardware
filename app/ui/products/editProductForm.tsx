@@ -57,7 +57,6 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
         return (
             <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
                 <h1 className="text-2xl font-bold mb-2">Producto Editado</h1>
-                <p className="text-sm text-zinc-600">{state.product.name} — <span className="font-medium">${state.product.price}</span></p>
             </div>
         );
     }
@@ -105,7 +104,7 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
                 <input id="image" type="url" name="image" placeholder="URL de la imagen" className="w-full border px-4 py-2 rounded text-lg" />
             </div>
             <div className="md:col-span-2 flex flex-col gap-4">
-                <button type="submit" className="px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full shadow hover:opacity-95 text-lg">
+                <button type="submit" className="px-5 py-3 bg-linear-to-r from-amber-500 to-orange-500 text-white rounded-full shadow hover:opacity-95 text-lg">
                     {state.loading ? "Editando..." : "Editar Producto"}
                 </button>
                 {state.errors && state.errors.map((error, index) => (

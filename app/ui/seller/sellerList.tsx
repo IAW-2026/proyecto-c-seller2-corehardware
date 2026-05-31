@@ -29,7 +29,7 @@ export default function ProductList() {
                         </div>
                         <div>
                             <Link href={`/dashboard/sellers/${seller.id}`}>
-                                <button className="px-4 py-2 bg-gradient-to-r from-rose-500 to-red-500 text-white rounded-full shadow">
+                                <button className="px-4 py-2 bg-linear-to-r from-rose-500 to-red-500 text-white rounded-full shadow">
                                     Ver Detalles
                                 </button>
                             </Link>
