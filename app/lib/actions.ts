@@ -393,6 +393,44 @@ export async function changePrice(id: string, price: number){
     }
 }
 
+export async function changeDescription(id: string, description: string){
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
+    const productId = coercionSchemaId.parse(id);
+    try{
+        const product = await prisma.product.update({
+            where: {id : productId, isDeleted : false},
+            data: {
+                description: description
+            }
+        });
+        revalidatePath(`/seller/${product.sellerId}/products/${product.id}`);
+    } catch(err){
+        throw new Error("Error del servidor, no se pudo actualizar la descripción");
+    }
+}
+
+export async function changeImageLink(id: string, imageLink: string){
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
+    const coercionSchemaImageLink = z.string().url({ message: "La imagen debe ser una URL válida" });
+    const productId = coercionSchemaId.parse(id);
+    const validImageLinkParse = coercionSchemaImageLink.safeParse(imageLink);
+    if(!validImageLinkParse.success){
+        throw new Error("El enlace de la imagen no es válido. Asegúrate de que sea una URL correcta.");
+    }
+    const validImageLink = validImageLinkParse.data;
+    try{
+        const product = await prisma.product.update({
+            where: {id : productId, isDeleted : false},
+            data: {
+                image: validImageLink
+            }
+        });
+        revalidatePath(`/seller/${product.sellerId}/products/${product.id}`);
+    } catch(err){
+        throw new Error("Error del servidor, no se pudo actualizar el enlace de la imagen");
+    }
+}
+
 export async function getSale(id: string){
     const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID de la venta debe ser un entero positivo" });
     const saleId = coercionSchemaId.parse(id);
@@ -400,6 +438,7 @@ export async function getSale(id: string){
         where: {id: saleId},
     })    
 }
+
 
 export async function getSales(){
     return await prisma.sale.findMany({

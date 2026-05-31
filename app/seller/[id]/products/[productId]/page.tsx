@@ -2,6 +2,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import AddStockForm from '@ui/products/addStockForm'
+import ChangePriceForm from "@/app/ui/products/changePriceForm";
+import ChangeDescriptionForm from "@/app/ui/products/changeDescriptionForm";
+import ChangeImageForm from "@/app/ui/products/changeImageForm";
 
 export default async function ProductPage({ params }: { params: { id: string; productId: string } }) {
   const { id, productId } = await params;
@@ -29,16 +32,18 @@ export default async function ProductPage({ params }: { params: { id: string; pr
             Volver a la Página del Vendedor
           </Link>
         </header>
-        <div className="grid gap-3">    
-            <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
-            <section className="space-y-6">
+        <div className="grid gap-3">
+
+            <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:auto-rows-max">
+            
+            <section className="space-y-6 min-w-0">
                 <div className="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900">
-                <img src={product.imageUrl} alt={product.name} className="h-[420px] w-full object-cover" />
+                <img src={product.imageUrl} alt={product.name} className="h-[380px] w-full object-cover" />
                 </div>
 
-                <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+                <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 min-h-[180px] lg:min-h-[200px] overflow-hidden">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Descripción</h2>
-                <p className="mt-4 text-base leading-7 text-gray-700 dark:text-zinc-300">{product.description}</p>
+                <p className="mt-4 text-base leading-7 text-gray-700 dark:text-zinc-300 break-words whitespace-normal">{product.description}</p>
                 </div>
             </section>
 
@@ -76,23 +81,11 @@ export default async function ProductPage({ params }: { params: { id: string; pr
             </div>
             <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Acciones</h2>
-                <div className="flex gap-21">
+                <div className="flex gap-3">
                     <AddStockForm productId={productId} initialStock={product.stock} />
-                    <Link href={`/seller/${id}/products/${productId}/change-price`} >
-                        <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
-                            Cambiar precio
-                        </button>
-                    </Link>
-                    <Link href={`/seller/${id}/products/${productId}/change-description`} >
-                        <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
-                            Cambiar descripción
-                        </button>
-                    </Link>
-                    <Link href={`/seller/${id}/products/${productId}/change-image`} >
-                        <button type="button" className="w-full rounded-full bg-zinc-900 px-4 py-3 text-white hover:bg-zinc-800">
-                            Cambiar imagen
-                        </button>
-                    </Link>
+                    <ChangePriceForm productId={productId} initialPrice={product.price} />
+                    <ChangeDescriptionForm productId={productId} initialDescription={product.description} />
+                    <ChangeImageForm productId={productId} initialImage={product.imageUrl} />
                 </div>
                 </div>
             </div>
