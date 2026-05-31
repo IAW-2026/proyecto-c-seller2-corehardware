@@ -178,7 +178,9 @@ function prismaSellerToSeller(prismaSeller: Prisma.SellerModel) {
     }
 }
 
-export async function getSellerDetails(sellerId:number) {
+export async function getSellerDetails(id:string) {
+    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" });
+    const sellerId = coercionSchema.parse(id);
     const seller = await prisma.seller.findUniqueOrThrow({
         where: { id: sellerId, isDeleted:false },
     });
@@ -305,7 +307,7 @@ export async function createSale( validatedData: createSaleRequestType){
             }
         }
     })).id;
-    validatedData.productIds.forEach( (id) => addProductToSale(saleId,id))
+    await Promise.all(validatedData.productIds.map((id) => addProductToSale(saleId, id)));
 }
 
 async function addProductToSale(saleId:number, productId:number){
@@ -326,11 +328,19 @@ async function addProductToSale(saleId:number, productId:number){
             productId:productId,
             productAmount:1
         }
-    })
+    });
+    await prisma.product.update({
+        where: { id: productId },
+        data: {
+            stock: {
+                decrement: 1
+            }
+        }
+    });
 }
 
-export async function getValidProductIdsFromSeller(sellerId:number){
-    return (await prisma.product.findMany({where:{sellerId:sellerId, isDeleted:false}})).map(product => product.id); 
+export async function getValidProducts(sellerId:number){
+    return await prisma.product.findMany({where:{sellerId:sellerId, isDeleted:false}}); 
 }
 
 

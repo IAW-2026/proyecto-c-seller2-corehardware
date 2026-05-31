@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 
-export default function ProductList({sellerId = undefined}: {sellerId?: number}) {
+export default function ProductList({sellerId = undefined, onDashboard = false}: {sellerId?: number, onDashboard?: boolean}) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -29,7 +29,7 @@ export default function ProductList({sellerId = undefined}: {sellerId?: number})
                         <p>Modelo: {product.model}</p>
                         <p>Precio: ${product.price}</p>
                         <p>Stock: {product.stock}</p>
-                        { !sellerId && (
+                        { onDashboard && (
                             <>
                                 <p>ID del Vendedor: {product.sellerId}</p>
                                 <p>Descripción: {product.description}</p>

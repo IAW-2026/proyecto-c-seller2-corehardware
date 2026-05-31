@@ -1,4 +1,4 @@
-import { validateSellerId, getValidProductIdsFromSeller, createSale } from "@/app/lib/actions";
+import { validateSellerId, getValidProducts, createSale } from "@/app/lib/actions";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from 'zod';
@@ -32,10 +32,25 @@ export async function POST(request:NextRequest) {
         return new Response(JSON.stringify({ message: `El vendedor con id ${vendedor_id} no existe.` }), { status: 400 });    
     }
 
-    const productIdsFromSeller = await getValidProductIdsFromSeller(vendedor_id);
-    const invalidProductId = productIdsFromSeller.find(id => !productIdsFromSeller.includes(id));
+    const validProducts = await getValidProducts(vendedor_id);
+    const productIdsFromSeller = validProducts.map(product => product.id);
+    const invalidProductId = productos.find(id => !productIdsFromSeller.includes(id));
     if( invalidProductId ){
         return new Response(JSON.stringify({ message: `El producto con id ${ invalidProductId } no existe o no corresponde al vendedor con id ${vendedor_id} especificado en el pedido`}));
+    }
+
+    const countsMap: Map<number, number> = new Map();
+    productos.forEach(id => {
+        countsMap.set(id, (countsMap.get(id) || 0) + 1);
+    });
+
+    const productWithInsufficientStock = validProducts.find(product => {
+        const requestedQuantity = countsMap.get(product.id) || 0;
+        return requestedQuantity > product.stock;
+    });
+
+    if (productWithInsufficientStock) {
+        return new Response(JSON.stringify({ message: `El producto con id ${productWithInsufficientStock.id} no tiene stock suficiente para la cantidad solicitada en el pedido` }), { status: 400 });
     }
 
     await createSale( {date:fecha, sellerId:vendedor_id, productIds:productos, price:monto} );
@@ -43,7 +58,8 @@ export async function POST(request:NextRequest) {
     } catch(err){
         return new Response(JSON.stringify({message: "Error del servidor, no se pudo crear venta."}),{ status:500 });
     }
-    const response = await fetch("/api/shipment", {
+    const URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/api/shipment` : "http://localhost:3000/api/shipment";
+    const response = await fetch(URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -2,8 +2,25 @@
 
 import Link from "next/link";
 import ProductList from "@ui/products/productList";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 
 export default function DashboardProducts() {
+    const searchParams = useSearchParams();
+    const [sellerId, setSellerId] = useState<number | undefined>(undefined);
+
+    useEffect(() => {
+        const sellerIdParam = searchParams.get("sellerId");
+        const validationSchema = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
+        const validatedSellerId = validationSchema.safeParse(sellerIdParam);
+        if (validatedSellerId.success) {
+            setSellerId(validatedSellerId.data);
+        } else {
+            setSellerId(undefined);
+        }    
+    }, [searchParams]);
+
     return (
         <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
             <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -16,7 +33,7 @@ export default function DashboardProducts() {
                             Crear Producto
                         </button>
                     </Link>
-                    <ProductList />
+                    <ProductList onDashboard={true} sellerId={sellerId} />
                 </div>
             </main>
         </div>
