@@ -20,15 +20,16 @@ export default function ProductList({sellerId = undefined, onDashboard = false}:
     if(loading) return( <h1 className="text-3xl font-bold mb-4"> Cargando productos...</h1> )
     return (
         <div>
-            <h1 className="text-3xl font-bold mb-4">Lista de Productos</h1>
-            <ul>
+            <h1 className="text-3xl font-bold mb-6">Lista de Productos</h1>
+            <ul className="grid gap-4">
                 {products.map((product) => (
-                    <li key={product.id} className="border p-4 mb-2 rounded">
-                        <h2 className="text-xl font-semibold">{product.name}</h2>
-                        <p>Marca: {product.brand}</p>
-                        <p>Modelo: {product.model}</p>
-                        <p>Precio: ${product.price}</p>
-                        <p>Stock: {product.stock}</p>
+                    <li key={product.id} className="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+                        <img src={product.imageUrl} alt={product.name} className="h-20 w-28 shrink-0 rounded-md object-cover" />
+                        <div className="flex-1">
+                            <h2 className="text-lg font-semibold">{product.name}</h2>
+                            <p className="text-sm text-zinc-500">{product.brand} • {product.model}</p>
+                            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">Precio: <span className="font-medium">${product.price}</span> · Stock: <span className="font-medium">{product.stock}</span></p>
+                        </div>
                         { onDashboard && (
                             <>
                                 <p>ID del Vendedor: {product.sellerId}</p>

@@ -47,18 +47,15 @@ export default function DeleteProduct({params}: {params: Promise<{ id: string }>
     if(errorMessage!=="") return( <p className="text-red-600"> Error: {errorMessage}. Con ID de producto: {product.id} </p> )
     else 
         return(
-            <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-                <h1 className="text-3xl font-bold mb-4">Producto Eliminado Exitosamente!</h1>
-                <p>Nombre: {product.name}</p>
-                <p>Id del Vendedor: {product.sellerId}</p>
-                <p>Marca: {product.brand}</p>
-                <p>Modelo: {product.model}</p>
-                <p>Precio: ${product.price}</p>
-                <p>Stock: {product.stock}</p>
-                <p>Descripción: {product.description}</p>
-                <p>Especificaciones: {product.specs}</p>
-                <p>Garantía: {product.warranty}</p>
-                <p>URL de la Imagen: {product.imageUrl}</p>
+            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+                <h1 className="text-2xl font-bold mb-2">Producto Eliminado</h1>
+                <p className="text-sm text-zinc-600">{product.name} — <span className="font-medium">${product.price}</span></p>
+                <div className="mt-4 grid gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                    <div>Id del Vendedor: {product.sellerId}</div>
+                    <div>Marca: {product.brand}</div>
+                    <div>Modelo: {product.model}</div>
+                    <div>Stock: {product.stock}</div>
+                </div>
             </div>
         )
     }

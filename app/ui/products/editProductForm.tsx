@@ -55,27 +55,18 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
 
     if(state.product) {
         return (
-            <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-                <h1 className="text-3xl font-bold mb-4">Producto Editado Exitosamente!</h1>
-                <p>Nombre: {state.product.name}</p>
-                <p>ID del Vendedor: {state.product.sellerId}</p>
-                <p>Marca: {state.product.brand}</p>
-                <p>Modelo: {state.product.model}</p>
-                <p>Precio: ${state.product.price}</p>
-                <p>Stock: {state.product.stock}</p>
-                <p>Descripción: {state.product.description}</p>
-                <p>Especificaciones: {state.product.specs}</p>
-                <p>Garantía: {state.product.warranty}</p>
-                <p>URL de la Imagen: {state.product.imageUrl}</p>
+            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+                <h1 className="text-2xl font-bold mb-2">Producto Editado</h1>
+                <p className="text-sm text-zinc-600">{state.product.name} — <span className="font-medium">${state.product.price}</span></p>
             </div>
         );
     }
     else{
     return (
-        <form action={formAction} className="grid grid-cols-2 gap-4 w-full max-w-5xl">
+        <form action={formAction} className="grid grid-cols-2 gap-6 w-full max-w-5xl bg-white rounded-xl p-6 shadow-sm dark:bg-zinc-950">
             <div className="flex flex-col gap-2">
-                <label htmlFor="name" className="text-lg font-medium">Nombre</label>
-                <input id="name" type="text" name="name" placeholder="Nombre del producto" className="w-full border px-4 py-2 rounded text-lg" />
+                <label htmlFor="name" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Nombre</label>
+                <input id="name" type="text" name="name" placeholder="Nombre del producto" className="w-full border border-zinc-200 px-4 py-2 rounded-lg shadow-sm bg-transparent" />
             </div>
             <div className="flex flex-col gap-2">
                 <label htmlFor="sellerId" className="text-lg font-medium">ID del vendedor</label>
@@ -114,7 +105,7 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
                 <input id="image" type="url" name="image" placeholder="URL de la imagen" className="w-full border px-4 py-2 rounded text-lg" />
             </div>
             <div className="md:col-span-2 flex flex-col gap-4">
-                <button type="submit" className="px-5 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-lg">
+                <button type="submit" className="px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full shadow hover:opacity-95 text-lg">
                     {state.loading ? "Editando..." : "Editar Producto"}
                 </button>
                 {state.errors && state.errors.map((error, index) => (

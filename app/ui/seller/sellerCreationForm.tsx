@@ -65,14 +65,13 @@ export default function SellerCreationForm(){
     const defaultPhoneNumber = user ? (user.phoneNumbers[0] ? user.phoneNumbers[0].phoneNumber : undefined) : undefined;
 
     return (
-        
-        <form action={formAction} className="flex flex-col gap-4 max-w-sm self-start -ml-8 text-sm">
+        <form action={formAction} className="flex flex-col gap-4 max-w-md w-full text-sm">
             <div className="flex items-center gap-4">
-                <label htmlFor="name" className="w-36 text-right text-base">Razón Social:</label>
+                <label htmlFor="name" className="w-40 text-right text-sm font-semibold text-zinc-700">Razón Social:</label>
                 { defaultName ? (
-                    <input id="name" type="text" name="name" defaultValue={defaultName} className="flex-1 border rounded px-3 py-2" />
+                    <input id="name" type="text" name="name" defaultValue={defaultName} className="flex-1 border border-zinc-200 rounded-md px-3 py-2 shadow-sm bg-transparent" />
                 ) : (
-                    <input id="name" type="text" name="name" placeholder="Razón Social" className="flex-1 border rounded px-3 py-2" />
+                    <input id="name" type="text" name="name" placeholder="Razón Social" className="flex-1 border border-zinc-200 rounded-md px-3 py-2 shadow-sm bg-transparent" />
                 ) }
             </div>
             <div className="flex items-center gap-4">
@@ -107,9 +106,11 @@ export default function SellerCreationForm(){
                 <label htmlFor="startOfActivities" className="w-36 text-right text-base">Inicio de actividades:</label>
                 <input id="startOfActivities" type="date" name="startOfActivities" className="flex-1 border rounded px-3 py-2" />
             </div>
-            <button type="submit" disabled={state.loading} className="bg-blue-500 text-white px-5 py-3 rounded ml-10">
-                { state.loading ? "Registrandose..." : "Registrarse como vendedor" }
-            </button>
+            <div className="mt-2">
+                <button type="submit" disabled={state.loading} className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-3 rounded-full shadow">
+                    { state.loading ? "Registrandose..." : "Registrarse como vendedor" }
+                </button>
+            </div>
             { state.errors && (
                 <div className="bg-red-100 text-red-700 p-2 rounded mt-2">
                     <ul>

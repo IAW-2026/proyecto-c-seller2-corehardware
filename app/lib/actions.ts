@@ -343,4 +343,14 @@ export async function getValidProducts(sellerId:number){
     return await prisma.product.findMany({where:{sellerId:sellerId, isDeleted:false}}); 
 }
 
+export async function getProductDetails(id:string){
+    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
+    const productId = coercionSchema.parse(id);
+    const product = await prisma.product.findUniqueOrThrow({
+        where: { id: productId, isDeleted:false},
+    });
+    return prismaProductToProduct(product);
+}
+
+
 
