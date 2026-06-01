@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { clerkClient, auth } from "@clerk/nextjs/server";
+import { ValidationError } from "./errors";
 
 
 export type Product = {
@@ -132,6 +133,7 @@ type getProductsFilteredRequestType = {
     name?: string,
     brand?: string,
     seller?: string,
+    sellerId?: number,
     hasStock?: boolean,
 }
 
@@ -139,7 +141,12 @@ export async function getProductsFiltered(parameters:getProductsFilteredRequestT
     const seller = await prisma.seller.findFirst({
         where : {name : parameters.seller, isDeleted: false}
     })
-    const sellerId = (seller == null )? undefined : seller.id;
+    if(parameters.sellerId && seller){
+        if(parameters.sellerId !== seller.id){
+            throw new ValidationError("El ID del vendedor no coincide con el nombre del vendedor proporcionado.");
+        }
+    }
+    const sellerId = parameters.sellerId || seller?.id;
     const greaterThan = parameters.hasStock ? 0 : undefined;
     const filteredProducts = await prisma.product.findMany({
         where:{
@@ -233,6 +240,7 @@ async function prismaProductoToForeignProduct(prismaProduct:Prisma.ProductModel)
         id: prismaProduct.id,
         nombre: prismaProduct.name,
         vendedor: seller.name,
+        vendedorId: prismaProduct.sellerId,
         marca: prismaProduct.brand,
         modelo: prismaProduct.model,
         precio: prismaProduct.price.toNumber(),

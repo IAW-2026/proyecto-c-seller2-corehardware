@@ -3,6 +3,7 @@ import { createProduct, deleteProduct, editProduct, getProductsFiltered } from "
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { Prisma } from "@prismaGenerated/client";
+import { ValidationError } from "@lib/errors";
 
 
 const getProductsFilteredSchema = z.object({
@@ -11,6 +12,7 @@ const getProductsFilteredSchema = z.object({
     name: z.string().optional(),
     brand: z.string().optional(),
     seller: z.string().optional(),
+    sellerId: z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional(),
     hasStock: z.boolean().optional()    
 })
 
@@ -27,6 +29,7 @@ export async function GET(request:NextRequest){
     const name = searchParams.get("name") ?? undefined;
     const brand = searchParams.get("brand") ?? undefined;
     const seller = searchParams.get("seller") ?? undefined;
+    const sellerId = searchParams.get("sellerId") ?? undefined;
     const hasStock = searchParams.get("hasStock") ?? undefined;
     const validatedParams = getProductsFilteredSchema.safeParse({
         offset,
@@ -34,6 +37,7 @@ export async function GET(request:NextRequest){
         name,
         brand,
         seller,
+        sellerId,
         hasStock,
     });
 
@@ -43,9 +47,11 @@ export async function GET(request:NextRequest){
 
     try{
         const products = await getProductsFiltered(validatedParams.data);
-        return new Response(JSON.stringify(products), { status: 200 });
+        return new Response(JSON.stringify({items: products, total: products.length}), { status: 200 });
     } catch(e){
-        console.log(e);
+        if (e instanceof ValidationError) {
+            return new Response(JSON.stringify({ message: e.message }), { status: 400 });
+        }
         return new Response(JSON.stringify({ message: 'Error interno del servidor. No se pudieron obtener los productos.' }), { status: 500 });
     };
 }
