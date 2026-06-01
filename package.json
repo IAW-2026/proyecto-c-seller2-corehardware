@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && next dev",
+    "dev": "prisma generate && prisma migrate dev && prisma db seed && next dev",
+    "ngrok": "ngrok http 3000",
     "build": "next build",
     "vercel-build": "prisma generate && next build",
     "start": "next start",
@@ -11,11 +12,16 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^7.3.3",
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@types/pg": "^8.20.0",
     "dotenv": "^17.4.2",
     "next": "16.2.6",
+    "pg": "^8.20.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tsx": "^4.22.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -24,6 +30,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "ngrok": "5.0.0-beta.2",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"

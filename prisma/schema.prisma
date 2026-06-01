@@ -10,5 +10,56 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id             Int             @id @default(autoincrement())
+  name           String
+  seller         Seller          @relation(fields: [sellerId], references: [id])
+  sellerId       Int
+  brand          String
+  model          String
+  price          Decimal
+  description    String
+  specs          String
+  warranty       String
+  stock          Int
+  image          String
+  isDeleted      Boolean         @default(false)
+  productOnSales ProductOnSale[]
+}
+
+model Seller {
+  id                Int       @id @default(autoincrement())
+  CUIT              String    
+  name              String
+  address           String
+  email             String    
+  phoneNumber       String
+  startOfActivities DateTime
+  VATCondition      String
+  ClerkUserId       String?
+  products          Product[]
+  sales             Sale[]
+  isDeleted         Boolean   @default(false)
+}
+
+model Sale {
+  id             Int             @id @default(autoincrement())
+  date           DateTime
+  seller         Seller          @relation(fields: [sellerId], references: [id])
+  sellerId       Int
+  totalPrice     Decimal
+  isDeleted      Boolean         @default(false)
+  productOnSales ProductOnSale[]
+}
+
+model ProductOnSale {
+  saleId        Int
+  productId     Int
+  productAmount Int
+  sale          Sale    @relation(fields: [saleId], references: [id])
+  product       Product @relation(fields: [productId], references: [id])
+
+  @@id([saleId, productId])
 }
