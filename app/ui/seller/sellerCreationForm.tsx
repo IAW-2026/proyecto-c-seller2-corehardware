@@ -67,11 +67,11 @@ export default function SellerCreationForm(){
     return (
         <form action={formAction} className="flex flex-col gap-4 max-w-md w-full text-sm">
             <div className="flex items-center gap-4">
-                <label htmlFor="name" className="w-40 text-right text-sm font-semibold text-zinc-700">Razón Social:</label>
+                <label htmlFor="name" className="w-36 text-right text-base">Razón Social:</label>
                 { defaultName ? (
-                    <input id="name" type="text" name="name" defaultValue={defaultName} className="flex-1 border border-zinc-200 rounded-md px-3 py-2 shadow-sm bg-transparent" />
+                    <input id="name" type="text" name="name" defaultValue={defaultName} className="flex-1 border rounded px-3 py-2" />
                 ) : (
-                    <input id="name" type="text" name="name" placeholder="Razón Social" className="flex-1 border border-zinc-200 rounded-md px-3 py-2 shadow-sm bg-transparent" />
+                    <input id="name" type="text" name="name" placeholder="Razón Social" className="flex-1 border rounded px-3 py-2" />
                 ) }
             </div>
             <div className="flex items-center gap-4">
