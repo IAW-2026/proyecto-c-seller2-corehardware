@@ -22,8 +22,8 @@ Enunciado completo: <https://iaw-2026.github.io/proyecto/>
 **1. Dominio de deploy**:https://proyecto-c-seller2-corehardware.vercel.app/
 
 **2. Usuarios**:
-- admin: admin+clerktest@iaw.com
-- usuario seller con seller creado 1: seller_created_1+clerktest@iaw.com
+- admin: admin+clerk_test@iaw.com
+- usuario seller con seller creado 1: seller_created_1+clerk_test@iaw.com
 - usuario seller con seller creado 2: seller_created_2+clerk_test@iaw.com 
 - usuario seller sin seller creado: seller_not_created+clerk_test@iaw.com
 - Contraseña de todos los usuarios: iawuser#
