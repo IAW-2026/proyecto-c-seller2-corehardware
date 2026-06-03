@@ -28,7 +28,7 @@ export default function AdminDashboard() {
                 </button>
               </Link>
               <Link href="/dashboard/sales">
-                <button className="rounded-3xl bg-linear-to-r from-orange-600 to-amber-600 px-18 py-4 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:from-orange-700 hover:to-amber-700">
+                <button className="rounded-3xl bg-linear-to-r from-orange-600 to-amber-600 px-16 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:from-orange-700 hover:to-amber-700">
                   Mostrar Ventas
                 </button>
               </Link>

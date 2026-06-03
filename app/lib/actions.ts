@@ -503,6 +503,119 @@ export async function getTotalSalesValue(sellerId?: string): Promise<string> {
     return totalSalesValue._sum.totalPrice ? totalSalesValue._sum.totalPrice.toString() : "0";
 }
 
+export async function getSalesOnPeriod(startDate: string, endDate: string,sellerId?: string): Promise<SaleDetails[]> {
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional();
+    const validSellerId = coercionSchemaId.parse(sellerId);
+    const coercionSchemaStartDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" });
+    const validStartDate = coercionSchemaStartDate.parse(startDate);
+    const coercionSchemaEndDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" }).min(validStartDate, { message: "La fecha de fin debe ser posterior a la fecha de inicio" });
+    const validEndDate = coercionSchemaEndDate.parse(endDate);
+    const salesWithSeller = await prisma.sale.findMany({
+        where: { 
+            sellerId: validSellerId, 
+            isDeleted:false,
+            date: {
+                gte: validStartDate,
+                lte: validEndDate,
+            }
+        },
+        select: {
+            id: true,
+            date: true,
+            totalPrice: true,
+            seller: {
+                select: {
+                    name: true,
+                }
+            }
+        },
+        orderBy:{
+            date:'desc'
+        }
+    });
+    return await Promise.all(salesWithSeller.map(async (sale) => {
+        const productsOnSale = await prisma.productOnSale.findMany({
+            where: { saleId: sale.id },
+            select: {
+                productId: true,
+                productAmount: true,
+                product: {
+                    select: {
+                        name: true,
+                    }
+                }
+            }
+        });
+        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+    }));
+}
+
+
+export async function getTotalSalesValueOnPeriod(startDate: string, endDate: string,sellerId?: string,): Promise<string> {
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional();
+    const validSellerId = coercionSchemaId.parse(sellerId);
+    const coercionSchemaStartDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" });
+    const validStartDate = coercionSchemaStartDate.parse(startDate);
+    const coercionSchemaEndDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" }).min(validStartDate, { message: "La fecha de fin debe ser posterior a la fecha de inicio" });
+    const validEndDate = coercionSchemaEndDate.parse(endDate);
+    const totalSalesValue = await prisma.sale.aggregate({
+        where: { 
+            sellerId: validSellerId,
+            isDeleted:false,
+            date: {
+                gte: validStartDate,
+                lte: validEndDate,
+            }
+        },
+        _sum: {
+            totalPrice: true,
+        }
+    });
+    return totalSalesValue._sum.totalPrice ? totalSalesValue._sum.totalPrice.toString() : "0";
+}
+    
+export async function getLastSales(limit: number, sellerId?: string): Promise<SaleDetails[]> {
+    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional();
+    const coercionSchemaLimit = z.coerce.number().int().positive({ message: "La cantidad de ventas debe ser un entero positivo" });
+    const validSellerId = coercionSchemaId.parse(sellerId);
+    const validLimit = coercionSchemaLimit.parse(limit);
+    const salesWithSeller = await prisma.sale.findMany({
+        where: { 
+            sellerId: validSellerId, 
+            isDeleted:false 
+        },
+        select: {
+            id: true,
+            date: true,
+            totalPrice: true,
+            seller: {
+                select: {
+                    name: true,
+                }
+            }
+        },
+        take: validLimit,
+        orderBy: {
+            date:'desc'
+        },
+    });
+    return await Promise.all(salesWithSeller.map(async (sale) => {
+        const productsOnSale = await prisma.productOnSale.findMany({
+            where: { saleId: sale.id },
+            select: {
+                productId: true,
+                productAmount: true,
+                product: {
+                    select: {
+                        name: true,
+                    }
+                }
+            }
+        });
+        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+    }));
+}    
+
 
 
 

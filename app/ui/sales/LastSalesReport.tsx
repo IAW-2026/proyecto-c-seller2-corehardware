@@ -1,9 +1,8 @@
+import { getLastSales, SaleDetails } from "@lib/actions";
 
-import { getSales, getTotalSalesValue, SaleDetails } from "@lib/actions";
-
-export default async function SalesReport( { sellerId }: { sellerId: string }) {
-    const sales: SaleDetails[] = await getSales(sellerId);
-    const totalSalesValue: string = await getTotalSalesValue(sellerId);
+export default async function SalesReport({ limit, sellerId=undefined }: { limit: number, sellerId?:string }) {
+    const sales: SaleDetails[] = sellerId ? await getLastSales(limit,sellerId) : await getLastSales(limit);
+    const totalSalesValue = (sales.map(sale => parseFloat(sale.totalPrice)*100).reduce((sum,current) => sum + current,0.00) / 100).toString();
 
     return (
         <div className="space-y-6">

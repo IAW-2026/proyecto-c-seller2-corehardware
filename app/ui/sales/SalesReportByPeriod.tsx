@@ -1,10 +1,10 @@
 
-import { getSales, getTotalSalesValue, SaleDetails } from "@lib/actions";
+import { getSalesOnPeriod, getTotalSalesValueOnPeriod, SaleDetails } from "@lib/actions";
 
-export default async function SalesReport( { sellerId=undefined }:{ sellerId?: string }) {
-    const sales: SaleDetails[] = sellerId ? await getSales(sellerId) : await getSales();
-    const totalSalesValue: string = sellerId ? await getTotalSalesValue(sellerId) : await getTotalSalesValue();
 
+export default async function SalesReportByPeriod( { startDate, endDate, sellerId = undefined }: { startDate: string, endDate: string, sellerId?: string }) {
+        const sales: SaleDetails[] = sellerId ? await getSalesOnPeriod(startDate, endDate,sellerId) : await getSalesOnPeriod(startDate,endDate);
+        const totalSalesValue: string = sellerId ? await getTotalSalesValueOnPeriod(startDate, endDate, sellerId) : await getTotalSalesValueOnPeriod(startDate, endDate);        
     return (
         <div className="space-y-6">
             <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
