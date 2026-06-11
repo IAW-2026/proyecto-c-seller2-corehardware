@@ -1,23 +1,14 @@
 'use client';
-import { getSellerNamesIds, SellerNameId } from "@lib/actions";
+import { SellerNameId } from "@lib/actions";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 
-export default function ProductList() {
-    const [sellers, setSellers] = useState<SellerNameId[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
+
+export default function SellerList( {page, sellers,sellerCount}:{page:number,sellers:SellerNameId[],sellerCount:number}) {
+    const router = useRouter();
     const pageLimit = 10; 
-    useEffect(() => {
-        const fetchSellers = async () => {
-            const fetchedSellers = await getSellerNamesIds();
-            setSellers(fetchedSellers);
-            setLoading(false);
-        };
-        fetchSellers();
-    }, [page]);
-    if(loading) return( <h1 className="text-3xl font-bold mb-4"> Cargando vendedores...</h1> )
+
     return (
         <div>
             <h1 className="text-3xl font-bold mb-6">Lista de Vendedores</h1>
@@ -37,22 +28,27 @@ export default function ProductList() {
                     </li>
                 ))}
             </ul>
+            { sellers.length === 0 && (
+                <div className="text-center py-8"><p className="text-sm text-zinc-600 dark:text-zinc-400">No hay más vendedores para mostrar</p></div>
+            ) }
+            { sellerCount > pageLimit &&(
             <div className="flex justify-between mt-6">
                 <button
-                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() => router.push( `?page=${Math.max(page - 1, 1)}`)}
                     className="px-4 py-2 bg-zinc-700 text-white rounded-md hover:bg-zinc-800 disabled:opacity-40"
                     disabled={page === 1}
                 >
                     Página anterior
                 </button>
                 <button
-                    onClick={() => setPage((prev) => prev + 1)}
+                    onClick={() => router.push(`?page=${page+1}`)}
                     className="px-4 py-2 bg-zinc-700 text-white rounded-md hover:bg-zinc-800 disabled:opacity-40"
                     disabled={sellers.length === 0}
                 >
                     Siguiente página
                 </button>
             </div>
+            )}
         </div>
     );
 }

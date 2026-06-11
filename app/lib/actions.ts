@@ -127,6 +127,10 @@ export async function getProducts(limit:number, page:number, sellerID?:number) {
     return products.map(prismaProductToProduct);
 }
 
+export async function getProductCount(sellerID?:number){
+    return await prisma.product.count({where: {isDeleted:false, sellerId: sellerID}})
+}
+
 type getProductsFilteredRequestType = {
     offset?:number,
     limit?:number,
@@ -202,11 +206,17 @@ export type SellerNameId = {
     name: string;
 }
 
-export async function getSellerNamesIds() {
+export async function getSellerNamesIds(limit:number, page:number) {
     const sellers = await prisma.seller.findMany({
         where: { isDeleted: false },
+        take: limit,
+        skip: (page-1)*limit,
     });
     return sellers.map((seller) => ({ name: seller.name, id: seller.id }));
+}
+
+export async function getSellerCount() {
+    return await prisma.seller.count({ where: { isDeleted: false }});
 }
 
 type GetSellerRequestType = { id:number }
@@ -298,6 +308,7 @@ export async function createSeller(validatedData:createSellerRequestType){
     const seller = await prisma.seller.create({
         data: validatedData
     });
+    revalidatePath("/dashboard/sellers");
     return `/seller/${seller.id}`;
 }
 

@@ -1,5 +1,5 @@
 'use client';
-import { getProducts, Product } from "@lib/actions";
+import { getProductCount, getProducts, Product } from "@lib/actions";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -7,12 +7,15 @@ import { useEffect, useState } from "react";
 export default function ProductList({sellerId = undefined, onDashboard = false}: {sellerId?: number, onDashboard?: boolean}) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [productCount, setProductCount] = useState(0);
     const [page, setPage] = useState(1);
     const pageLimit = (sellerId) ? 10 : 5; 
     useEffect(() => {
         const fetchProducts = async () => {
             const fetchedProducts = await getProducts(pageLimit, page, sellerId);
+            const fetchedProductCount = await getProductCount(sellerId);
             setProducts(fetchedProducts);
+            setProductCount(fetchedProductCount);
             setLoading(false);
         };
         fetchProducts();
@@ -75,6 +78,7 @@ export default function ProductList({sellerId = undefined, onDashboard = false}:
             { products.length === 0 && (
                 <div className="text-center py-8"><p className="text-sm text-zinc-600 dark:text-zinc-400">No hay más productos para mostrar</p></div>
             ) }
+            { productCount > pageLimit && (
             <div className="flex justify-between gap-2 pt-4">
                 <button
                     onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
@@ -91,6 +95,7 @@ export default function ProductList({sellerId = undefined, onDashboard = false}:
                     Siguiente
                 </button>
             </div>
+            )}
         </div>
     );
 }
