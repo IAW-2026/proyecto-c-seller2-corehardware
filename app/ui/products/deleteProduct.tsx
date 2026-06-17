@@ -5,8 +5,8 @@ import { Product } from "@/app/lib/actions";
 
 export default function DeleteProduct({params}: {params: Promise<{ id: string }>}) {
     const emptyProduct: Product = {
-        id : 0,
-        sellerId : 0,
+        id : "",
+        sellerId : "",
         name : "",
         brand : "",
         model : "",

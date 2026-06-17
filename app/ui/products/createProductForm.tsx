@@ -5,7 +5,7 @@ import { useActionState } from "react";
 
 type createProductForm ={
     name: string;
-    sellerId: number;
+    sellerId: string;
     brand: string;
     model: string;
     price: number;
@@ -17,7 +17,7 @@ type createProductForm ={
 }
 
 
-export default function CreateProductForm({sellerId = undefined}: {sellerId?: number}) {
+export default function CreateProductForm({sellerId = undefined}: {sellerId?: string}) {
     const initialState: State = {
         product: null,
         loading: false,
@@ -29,7 +29,7 @@ export default function CreateProductForm({sellerId = undefined}: {sellerId?: nu
         const entries = Object.fromEntries(formData.entries());
         const createProductData: createProductForm = {
             name: entries.name as string,
-            sellerId: sellerId || Number(entries.sellerId),
+            sellerId: sellerId || (entries.sellerId as string),
             brand: entries.brand as string,
             model: entries.model as string,
             price: entries.price ? Number(entries.price) : 0.00,
@@ -89,7 +89,7 @@ export default function CreateProductForm({sellerId = undefined}: {sellerId?: nu
                 {!sellerId && (
             <div className="flex flex-col gap-2">
                 <label htmlFor="sellerId" className="text-lg font-medium">ID del vendedor</label>
-                <input id="sellerId" type="number" name="sellerId" placeholder="ID del vendedor" className="w-full border px-4 py-2 rounded text-lg" required />
+                <input id="sellerId" type="text" name="sellerId" placeholder="ID del vendedor" className="w-full border px-4 py-2 rounded text-lg" required />
             </div> ) }
             <div className="flex flex-col gap-2">
                 <label htmlFor="brand" className="text-lg font-medium">Marca</label>
@@ -124,7 +124,7 @@ export default function CreateProductForm({sellerId = undefined}: {sellerId?: nu
                 <input id="image" type="url" name="image" placeholder="URL de la imagen" className="w-full border px-4 py-2 rounded text-lg" required />
             </div>
             <div className="md:col-span-2 flex flex-col gap-4">
-                <button type="submit" className="px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full shadow hover:opacity-95 text-lg">
+                <button type="submit" className="px-5 py-3 bg-linear-to-r from-emerald-500 to-teal-500 text-white rounded-full shadow hover:opacity-95 text-lg">
                     {state.loading ? "Creando..." : "Crear Producto"}
                 </button>
                 {state.errors && state.errors.map((error, index) => (

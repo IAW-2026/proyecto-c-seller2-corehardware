@@ -4,11 +4,9 @@ import { NextRequest } from "next/server";
 import { z } from 'zod';
 
 const createSaleSchema = z.object({
-    id: z.coerce.number().int().positive({ message: "El ID del pedido debe ser un entero positivo" }),
     fecha: z.coerce.date(),
-    comprador_id: z.coerce.number().int().positive({ message: "El ID del comprador debe ser un entero positivo" }),
-    vendedor_id: z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }),
-    productos: z.array(z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" })).nonempty({message: "El pedido debe tener productos"}),
+    vendedor_id: z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }),
+    productos: z.array(z.string().cuid({ message: "El ID del producto debe ser un cuid válido" })).nonempty({ message: "El pedido debe tener productos" }),
     monto: z.coerce.number().gt(0, { message: "El monto debe ser mayor que 0" }),
 })
 
@@ -39,7 +37,7 @@ export async function POST(request:NextRequest) {
         return new Response(JSON.stringify({ message: `El producto con id ${ invalidProductId } no existe o no corresponde al vendedor con id ${vendedor_id} especificado en el pedido`}));
     }
 
-    const countsMap: Map<number, number> = new Map();
+    const countsMap: Map<string, number> = new Map();
     productos.forEach(id => {
         countsMap.set(id, (countsMap.get(id) || 0) + 1);
     });

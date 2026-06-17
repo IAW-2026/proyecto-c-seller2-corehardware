@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 
-export default function ProductList({sellerId = undefined, onDashboard = false}: {sellerId?: number, onDashboard?: boolean}) {
+export default function ProductList({sellerId = undefined, onDashboard = false}: {sellerId?: string, onDashboard?: boolean}) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [productCount, setProductCount] = useState(0);
