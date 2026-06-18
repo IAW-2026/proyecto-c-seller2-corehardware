@@ -5,7 +5,7 @@ import ProductList from "@ui/products/productList";
 import { use } from "react";
 
 export default function SellerProducts({params}: {params: Promise<{ id: string }>}) {
-    const id = Number(use(params).id);
+    const id = use(params).id;
     return (
         <div className="min-h-screen bg-linear-to-b from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-950 dark:to-black py-12">
             <main className="mx-auto w-full max-w-6xl px-4 sm:px-6">

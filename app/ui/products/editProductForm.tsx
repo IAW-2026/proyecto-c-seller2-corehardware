@@ -18,7 +18,7 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
         const createProductData = {
             id: (await params).id,
             name: entries.name ? entries.name as string : undefined,
-            sellerId: entries.sellerId ? Number(entries.sellerId) : undefined,
+            sellerId: entries.sellerId ? (entries.sellerId as string) : undefined,
             brand: entries.brand ? entries.brand as string : undefined,
             model: entries.model ? entries.model as string : undefined,
             price: entries.price ? Number(entries.price) : undefined,
@@ -69,7 +69,7 @@ export default function EditProductForm({params}: {params: Promise<{ id: string 
             </div>
             <div className="flex flex-col gap-2">
                 <label htmlFor="sellerId" className="text-lg font-medium">ID del vendedor</label>
-                <input id="sellerId" type="number" name="sellerId" placeholder="ID del vendedor" className="w-full border px-4 py-2 rounded text-lg" />
+                <input id="sellerId" type="text" name="sellerId" placeholder="ID del vendedor" className="w-full border px-4 py-2 rounded text-lg" />
             </div>
             <div className="flex flex-col gap-2">
                 <label htmlFor="brand" className="text-lg font-medium">Marca</label>

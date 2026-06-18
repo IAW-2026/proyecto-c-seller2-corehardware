@@ -13,10 +13,10 @@ datasource db {
 }
 
 model Product {
-  id             Int             @id @default(autoincrement())
+  id             String          @id @default(cuid())
   name           String
   seller         Seller          @relation(fields: [sellerId], references: [id])
-  sellerId       Int
+  sellerId       String
   brand          String
   model          String
   price          Decimal
@@ -30,11 +30,11 @@ model Product {
 }
 
 model Seller {
-  id                Int       @id @default(autoincrement())
-  CUIT              String    
+  id                String    @id @default(cuid())
+  CUIT              String
   name              String
   address           String
-  email             String    
+  email             String
   phoneNumber       String
   startOfActivities DateTime
   VATCondition      String
@@ -45,18 +45,18 @@ model Seller {
 }
 
 model Sale {
-  id             Int             @id @default(autoincrement())
+  id             String          @id @default(cuid())
   date           DateTime
   seller         Seller          @relation(fields: [sellerId], references: [id])
-  sellerId       Int
+  sellerId       String
   totalPrice     Decimal
   isDeleted      Boolean         @default(false)
   productOnSales ProductOnSale[]
 }
 
 model ProductOnSale {
-  saleId        Int
-  productId     Int
+  saleId        String
+  productId     String
   productAmount Int
   sale          Sale    @relation(fields: [saleId], references: [id])
   product       Product @relation(fields: [productId], references: [id])

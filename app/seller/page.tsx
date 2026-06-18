@@ -14,18 +14,32 @@ export default function SellerPage() {
     const [sellerStatus, setSellerStatus] = useState(SellerStatus.Unchecked);
 
     useEffect(() => {
-        async function redirectToSeller(){
-            const sellerId = await checkUser( userId ? userId : undefined );
-            if( sellerId ){
-                setSellerStatus(SellerStatus.CheckedTrue);
-                router.push(`/seller/${sellerId}`);
-            } else {
-                if(isLoaded) setSellerStatus(SellerStatus.CheckedFalse)
-            }     
+        async function redirectToSeller() {
+            if (!isLoaded) {
+                return;
+            }
+
+            if (!userId) {
+                setSellerStatus(SellerStatus.CheckedFalse);
+                return;
+            }
+
+            try {
+                const sellerId = await checkUser(userId);
+                if (sellerId) {
+                    setSellerStatus(SellerStatus.CheckedTrue);
+                    router.replace(`/seller/${sellerId}`);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error al verificar el vendedor del usuario:", error);
+            }
+
+            setSellerStatus(SellerStatus.CheckedFalse);
         }
-        redirectToSeller();
-        
-    },[isLoaded]);
+
+        void redirectToSeller();
+    }, [isLoaded, userId, router]);
 
     if(!isLoaded){
     return (
@@ -35,7 +49,7 @@ export default function SellerPage() {
             </h1>
         </div>
     ) } else{
-            if(sellerStatus === SellerStatus.CheckedFalse){
+            if(sellerStatus === SellerStatus.CheckedFalse || !userId){
                 return(
                     <div className="min-h-screen bg-linear-to-b from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-950 dark:to-black py-12">
                         <main className="mx-auto w-full max-w-4xl px-4 sm:px-6">

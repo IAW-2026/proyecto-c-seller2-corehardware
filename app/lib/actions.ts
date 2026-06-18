@@ -10,8 +10,8 @@ import { ValidationError } from "./errors";
 
 
 export type Product = {
-    id: number;
-    sellerId: number;
+    id: string;
+    sellerId: string;
     name: string;
     brand: string;
     model: string;
@@ -55,7 +55,7 @@ const prisma = new PrismaClient({
 
 type CreateProductRequestType = {
     name: string;
-    sellerId: number;
+    sellerId: string;
     brand: string;
     model: string;
     price: number;
@@ -79,9 +79,9 @@ export async function createProduct(validatedData: CreateProductRequestType) {
 }
 
 type EditProductRequestType = {
-    id: number,
+    id: string,
     name?: string;
-    sellerId?: number;
+    sellerId?: string;
     brand?: string;
     model?: string;
     price?: number;
@@ -106,7 +106,7 @@ export async function editProduct(validatedData: EditProductRequestType) {
     return prismaProductToProduct(product);
 }
 
-type DeleteProductRequestType = { id:number }
+type DeleteProductRequestType = { id:string }
 
 export async function deleteProduct(validatedData:DeleteProductRequestType) {
     const { id } = validatedData;
@@ -118,7 +118,7 @@ export async function deleteProduct(validatedData:DeleteProductRequestType) {
     return prismaProductToProduct(product);
 }
 
-export async function getProducts(limit:number, page:number, sellerID?:number) {
+export async function getProducts(limit:number, page:number, sellerID?:string) {
     const products = await prisma.product.findMany({
         where: { isDeleted: false, sellerId: sellerID },
         take: limit,
@@ -127,13 +127,17 @@ export async function getProducts(limit:number, page:number, sellerID?:number) {
     return products.map(prismaProductToProduct);
 }
 
+export async function getProductCount(sellerID?:string){
+    return await prisma.product.count({where: {isDeleted:false, sellerId: sellerID}})
+}
+
 type getProductsFilteredRequestType = {
     offset?:number,
     limit?:number,
     name?: string,
     brand?: string,
     seller?: string,
-    sellerId?: number,
+    sellerId?: string,
     hasStock?: boolean,
 }
 
@@ -165,7 +169,7 @@ export async function getProductsFiltered(parameters:getProductsFilteredRequestT
 }
 
 export type SellerDetails = {
-    id: number;
+    id: string;
     name: string;
     CUIT: string;
     address: string;
@@ -189,8 +193,8 @@ function prismaSellerToSeller(prismaSeller: Prisma.SellerModel) {
 }
 
 export async function getSellerDetails(id:string) {
-    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" });
-    const sellerId = coercionSchema.parse(id);
+    const schema = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" });
+    const sellerId = schema.parse(id);
     const seller = await prisma.seller.findUniqueOrThrow({
         where: { id: sellerId, isDeleted:false },
     });
@@ -198,18 +202,24 @@ export async function getSellerDetails(id:string) {
 }
 
 export type SellerNameId = {
-    id: number;
+    id: string;
     name: string;
 }
 
-export async function getSellerNamesIds() {
+export async function getSellerNamesIds(limit:number, page:number) {
     const sellers = await prisma.seller.findMany({
         where: { isDeleted: false },
+        take: limit,
+        skip: (page-1)*limit,
     });
     return sellers.map((seller) => ({ name: seller.name, id: seller.id }));
 }
 
-type GetSellerRequestType = { id:number }
+export async function getSellerCount() {
+    return await prisma.seller.count({ where: { isDeleted: false }});
+}
+
+type GetSellerRequestType = { id:string }
 
 function prismaSellerToForeignSeller(prismaSeller:Prisma.SellerModel){
     return {
@@ -230,7 +240,7 @@ export async function getSeller(validatedData:GetSellerRequestType){
     return prismaSellerToForeignSeller(seller);
 }
 
-type GetProductRequestType = { id: number }
+type GetProductRequestType = { id: string }
 
 async function prismaProductoToForeignProduct(prismaProduct:Prisma.ProductModel){
     const seller = await prisma.seller.findUniqueOrThrow({
@@ -262,16 +272,16 @@ export async function getProduct(validatedData:GetProductRequestType){
 
 
 export async function getSellerName(id : string) {
-    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" });
-    const sellerId = coercionSchema.parse(id);
+    const schema = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" });
+    const sellerId = schema.parse(id);
     const seller = await prisma.seller.findUniqueOrThrow({
         where: { id: sellerId, isDeleted:false},
     });
     return seller.name;
 }
 
-export async function validateSellerId(id : number) {
-    return await prisma.seller.count({ where: { id:id, isDeleted:false }}) > 0;    
+export async function validateSellerId(id : string) {
+    return await prisma.seller.count({ where: { id:id, isDeleted:false }}) > 0;
 }
 
 export async function checkUser(clerkId:string|undefined){
@@ -298,14 +308,15 @@ export async function createSeller(validatedData:createSellerRequestType){
     const seller = await prisma.seller.create({
         data: validatedData
     });
+    revalidatePath("/dashboard/sellers");
     return `/seller/${seller.id}`;
 }
 
 type createSaleRequestType = {
     date: Date,
-    sellerId: number,
+    sellerId: string,
     price: number,
-    productIds: number[],
+    productIds: string[],
 }
 
 export async function createSale( validatedData: createSaleRequestType){
@@ -321,7 +332,7 @@ export async function createSale( validatedData: createSaleRequestType){
     await Promise.all(validatedData.productIds.map((id) => addProductToSale(saleId, id)));
 }
 
-async function addProductToSale(saleId:number, productId:number){
+async function addProductToSale(saleId:string, productId:string){
     await prisma.productOnSale.upsert({
         where:{
             saleId_productId:{
@@ -350,13 +361,13 @@ async function addProductToSale(saleId:number, productId:number){
     });
 }
 
-export async function getValidProducts(sellerId:number){
-    return await prisma.product.findMany({where:{sellerId:sellerId, isDeleted:false}}); 
+export async function getValidProducts(sellerId:string){
+    return await prisma.product.findMany({where:{sellerId:sellerId, isDeleted:false}});
 }
 
 export async function getProductDetails(id:string){
-    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
-    const productId = coercionSchema.parse(id);
+    const schema = z.string().cuid({ message: "El ID del producto debe ser un cuid válido" });
+    const productId = schema.parse(id);
     const product = await prisma.product.findUniqueOrThrow({
         where: { id: productId, isDeleted:false},
     });
@@ -364,10 +375,10 @@ export async function getProductDetails(id:string){
 }
 
 export async function addStock(id: string, stock: number){
-    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
-    const coercionSchemaStock = z.coerce.number().int().positive({ message: "El incremento en el stock del producto debe ser un entero positivo" });
-    const productId = coercionSchemaId.parse(id);
-    const addedStock = coercionSchemaStock.parse(stock);
+    const schemaId = z.string().cuid({ message: "El ID del producto debe ser un cuid válido" });
+    const schemaStock = z.coerce.number().int().positive({ message: "El incremento en el stock del producto debe ser un entero positivo" });
+    const productId = schemaId.parse(id);
+    const addedStock = schemaStock.parse(stock);
     try{
     const product = await prisma.product.update({
         where: {id : productId, isDeleted:false},
@@ -384,10 +395,10 @@ export async function addStock(id: string, stock: number){
 }
 
 export async function changePrice(id: string, price: number){
-    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
-    const coercionSchemaPrice = z.coerce.number().gt(0, { message: "El precio debe ser mayor que 0" });
-    const productId = coercionSchemaId.parse(id);
-    const changedPrice = coercionSchemaPrice.parse(price);
+    const schemaId = z.string().cuid({ message: "El ID del producto debe ser un cuid válido" });
+    const schemaPrice = z.coerce.number().gt(0, { message: "El precio debe ser mayor que 0" });
+    const productId = schemaId.parse(id);
+    const changedPrice = schemaPrice.parse(price);
     try{
     const product = await prisma.product.update({
         where: {id : productId, isDeleted : false},
@@ -402,8 +413,8 @@ export async function changePrice(id: string, price: number){
 }
 
 export async function changeDescription(id: string, description: string){
-    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
-    const productId = coercionSchemaId.parse(id);
+    const schemaId = z.string().cuid({ message: "El ID del producto debe ser un cuid válido" });
+    const productId = schemaId.parse(id);
     try{
         const product = await prisma.product.update({
             where: {id : productId, isDeleted : false},
@@ -418,10 +429,10 @@ export async function changeDescription(id: string, description: string){
 }
 
 export async function changeImageLink(id: string, imageLink: string){
-    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" });
-    const coercionSchemaImageLink = z.string().url({ message: "La imagen debe ser una URL válida" });
-    const productId = coercionSchemaId.parse(id);
-    const validImageLinkParse = coercionSchemaImageLink.safeParse(imageLink);
+    const schemaId = z.string().cuid({ message: "El ID del producto debe ser un cuid válido" });
+    const schemaImageLink = z.string().url({ message: "La imagen debe ser una URL válida" });
+    const productId = schemaId.parse(id);
+    const validImageLinkParse = schemaImageLink.safeParse(imageLink);
     if(!validImageLinkParse.success){
         throw new Error("El enlace de la imagen no es válido. Asegúrate de que sea una URL correcta.");
     }
@@ -440,14 +451,14 @@ export async function changeImageLink(id: string, imageLink: string){
 }
 
 export type SaleDetails = {
-    id: number;
+    id: string;
     date: Date;
     totalPrice: string;
     sellerName: string;
     products: string;
 }
 
-function prismaSaleToSaleDetails(prismaSale: { id: number; date: Date; totalPrice: Prisma.Decimal }, sellerName: string, productsOnSale: { product: { name: string; }; productId: number; productAmount: number; }[]): SaleDetails {
+function prismaSaleToSaleDetails(prismaSale: { id: string; date: Date; totalPrice: Prisma.Decimal }, sellerName: string, productsOnSale: { product: { name: string; }; productId: string; productAmount: number; }[]): SaleDetails {
     const products = productsOnSale.map((pos) => ` "${pos.product.name}" X ${pos.productAmount}`).join(", ");
     return {
         id: prismaSale.id,
@@ -459,8 +470,8 @@ function prismaSaleToSaleDetails(prismaSale: { id: number; date: Date; totalPric
 }
 
 export async function getSales(sellerId?: string): Promise<SaleDetails[]> {
-    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional();
-    const validSellerId = coercionSchemaId.parse(sellerId);
+    const schemaId = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional();
+    const validSellerId = schemaId.parse(sellerId);
     const salesWithSeller = await prisma.sale.findMany({
         where: { sellerId: validSellerId, isDeleted:false },
         select: {
@@ -492,8 +503,8 @@ export async function getSales(sellerId?: string): Promise<SaleDetails[]> {
 }
 
 export async function getTotalSalesValue(sellerId?: string): Promise<string> {
-    const coercionSchemaId = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional();
-    const validSellerId = coercionSchemaId.parse(sellerId);
+    const schemaId = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional();
+    const validSellerId = schemaId.parse(sellerId);
     const totalSalesValue = await prisma.sale.aggregate({
         where: { sellerId: validSellerId, isDeleted:false },
         _sum: {
@@ -503,12 +514,125 @@ export async function getTotalSalesValue(sellerId?: string): Promise<string> {
     return totalSalesValue._sum.totalPrice ? totalSalesValue._sum.totalPrice.toString() : "0";
 }
 
+export async function getSalesOnPeriod(startDate: string, endDate: string,sellerId?: string): Promise<SaleDetails[]> {
+    const schemaId = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional();
+    const validSellerId = schemaId.parse(sellerId);
+    const coercionSchemaStartDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" });
+    const validStartDate = coercionSchemaStartDate.parse(startDate);
+    const coercionSchemaEndDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" }).min(validStartDate, { message: "La fecha de fin debe ser posterior a la fecha de inicio" });
+    const validEndDate = coercionSchemaEndDate.parse(endDate);
+    const salesWithSeller = await prisma.sale.findMany({
+        where: { 
+            sellerId: validSellerId, 
+            isDeleted:false,
+            date: {
+                gte: validStartDate,
+                lte: validEndDate,
+            }
+        },
+        select: {
+            id: true,
+            date: true,
+            totalPrice: true,
+            seller: {
+                select: {
+                    name: true,
+                }
+            }
+        },
+        orderBy:{
+            date:'desc'
+        }
+    });
+    return await Promise.all(salesWithSeller.map(async (sale) => {
+        const productsOnSale = await prisma.productOnSale.findMany({
+            where: { saleId: sale.id },
+            select: {
+                productId: true,
+                productAmount: true,
+                product: {
+                    select: {
+                        name: true,
+                    }
+                }
+            }
+        });
+        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+    }));
+}
+
+
+export async function getTotalSalesValueOnPeriod(startDate: string, endDate: string,sellerId?: string,): Promise<string> {
+    const schemaId = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional();
+    const validSellerId = schemaId.parse(sellerId);
+    const coercionSchemaStartDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" });
+    const validStartDate = coercionSchemaStartDate.parse(startDate);
+    const coercionSchemaEndDate = z.coerce.date({ message: "La fecha debe ser una fecha válida" }).min(validStartDate, { message: "La fecha de fin debe ser posterior a la fecha de inicio" });
+    const validEndDate = coercionSchemaEndDate.parse(endDate);
+    const totalSalesValue = await prisma.sale.aggregate({
+        where: { 
+            sellerId: validSellerId,
+            isDeleted:false,
+            date: {
+                gte: validStartDate,
+                lte: validEndDate,
+            }
+        },
+        _sum: {
+            totalPrice: true,
+        }
+    });
+    return totalSalesValue._sum.totalPrice ? totalSalesValue._sum.totalPrice.toString() : "0";
+}
+    
+export async function getLastSales(limit: number, sellerId?: string): Promise<SaleDetails[]> {
+    const schemaId = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional();
+    const coercionSchemaLimit = z.coerce.number().int().positive({ message: "La cantidad de ventas debe ser un entero positivo" });
+    const validSellerId = schemaId.parse(sellerId);
+    const validLimit = coercionSchemaLimit.parse(limit);
+    const salesWithSeller = await prisma.sale.findMany({
+        where: { 
+            sellerId: validSellerId, 
+            isDeleted:false 
+        },
+        select: {
+            id: true,
+            date: true,
+            totalPrice: true,
+            seller: {
+                select: {
+                    name: true,
+                }
+            }
+        },
+        take: validLimit,
+        orderBy: {
+            date:'desc'
+        },
+    });
+    return await Promise.all(salesWithSeller.map(async (sale) => {
+        const productsOnSale = await prisma.productOnSale.findMany({
+            where: { saleId: sale.id },
+            select: {
+                productId: true,
+                productAmount: true,
+                product: {
+                    select: {
+                        name: true,
+                    }
+                }
+            }
+        });
+        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+    }));
+}    
+
 
 
 
 export async function deleteSeller(id:string){
-    const coercionSchema = z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" });
-    const sellerId = coercionSchema.parse(id);
+    const schema = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" });
+    const sellerId = schema.parse(id);
     const client = await clerkClient();
     const authData = await auth();
     if(authData.sessionId){

@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
+import { createId } from "@paralleldrive/cuid2";
 
 
 // Mock de la API shipment de la ShippingApp
@@ -14,6 +15,6 @@ export async function POST(request:NextRequest){
 
     const {id , monto} = await request.json();
 
-    return new Response(JSON.stringify({ id:(Math.floor(Math.random()*10000)), pedido_id: id, fecha_de_entrega:"", estado:"", monto: monto+3.5, direccion:"" }),{ status: 201})
+    return new Response(JSON.stringify({ id:(createId()), pedido_id: id, fecha_de_entrega:"", estado:"", monto: monto+3.5, direccion:"" }),{ status: 201})
     } catch(err) { return new Response(JSON.stringify({ message: 'Bad Request' }), { status: 400 })}
 }

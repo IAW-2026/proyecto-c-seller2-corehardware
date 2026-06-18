@@ -12,7 +12,7 @@ const getProductsFilteredSchema = z.object({
     name: z.string().optional(),
     brand: z.string().optional(),
     seller: z.string().optional(),
-    sellerId: z.coerce.number().int().positive({ message: "El ID del vendedor debe ser un entero positivo" }).optional(),
+    sellerId: z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional(),
     hasStock: z.boolean().optional()    
 })
 
@@ -59,7 +59,7 @@ export async function GET(request:NextRequest){
 
 const createProductSchema = z.object({
   name: z.string(),
-  sellerId: z.coerce.number().int().positive({ message: "El Seller ID debe ser un entero positivo" }),
+  sellerId: z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }),
   brand: z.string(),
   model: z.string(),
   price: z.coerce.number().gt(0, { message: "El precio debe ser mayor que 0" }),
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     }
 }
 
-const deleteProductSchema = z.object({ id: z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" }) });
+const deleteProductSchema = z.object({ id: z.string().cuid({ message: "El ID del producto debe ser un cuid válido" }) });
 
 export async function DELETE(request: NextRequest) {
     const requestHeaders = await headers();
@@ -143,9 +143,9 @@ export async function DELETE(request: NextRequest) {
 }
 
 const editProductSchema = z.object({
-    id: z.coerce.number().int().positive({ message: "El ID del producto debe ser un entero positivo" }),
+    id: z.string().cuid({ message: "El ID del producto debe ser un cuid válido" }),
     name: z.string().optional(),
-    sellerId: z.coerce.number().int().positive({ message: "El Seller ID del producto debe ser un entero positivo" }).optional(),
+    sellerId: z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional(),
     brand: z.string().optional(),
     model: z.string().optional(),
     price: z.coerce.number().gt(0, { message: "El precio debe ser mayor que 0" }).optional(),

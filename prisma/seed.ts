@@ -344,26 +344,26 @@ main()
 
 
 
-async function createSale( validatedData: { sellerId: number, price: number, date: Date, productIds: number[]}){
+async function createSale(validatedData: { sellerId: string; price: number; date: Date; productIds: string[] }) {
     const sale = await prisma.sale.create({
-        data:{
+        data: {
             date: validatedData.date,
             totalPrice: validatedData.price,
-            seller:{
-                connect: { id: validatedData.sellerId}
+            seller: {
+                connect: { id: validatedData.sellerId }
             }
         }
     });
-    await Promise.all(validatedData.productIds.map( (id) => addProductToSale(sale.id,id)));
+    await Promise.all(validatedData.productIds.map((id) => addProductToSale(sale.id, id)));
     return sale;
 }
 
-async function addProductToSale(saleId:number, productId:number){
-  const productOnSale = await prisma.productOnSale.upsert({
+async function addProductToSale(saleId: string, productId: string) {
+  await prisma.productOnSale.upsert({
         where:{
             saleId_productId:{
-                saleId:saleId,
-                productId:productId,
+                saleId,
+                productId,
             }
         },
         update:{
@@ -372,8 +372,8 @@ async function addProductToSale(saleId:number, productId:number){
             }
         },
         create: {
-            saleId:saleId,
-            productId:productId,
+            saleId,
+            productId,
             productAmount:1
         }
     });

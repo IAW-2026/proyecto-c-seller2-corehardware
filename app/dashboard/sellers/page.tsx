@@ -1,8 +1,32 @@
-'use client';
 
 import SellerList from "@/app/ui/seller/sellerList";
+import { getSellerCount, getSellerNamesIds, SellerNameId } from "@/app/lib/actions";
+import { notFound } from "next/navigation";
+import z from "zod";
 
-export default function DashboardSellers() {
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+
+
+
+export default async function DashboardSellers({ searchParams }: { searchParams:SearchParams }) {
+    const page = (await searchParams)?.page;
+    const limit = 10;
+    let validatedPage: number = 1;
+    const coercionSchemaLimit = z.coerce.number().int().positive({ message: "El número de páguina debe ser un entero positivo" }).optional();
+    const pageValidation = coercionSchemaLimit.safeParse(page);
+    if( ! pageValidation.success) notFound();
+    else validatedPage = pageValidation.data || 1;
+    let sellerCount = 0;
+    let sellers:SellerNameId[] = []
+    try{
+    sellerCount = await getSellerCount();
+    sellers = await getSellerNamesIds(limit,validatedPage);
+    } catch( err ) { 
+        console.log(err);
+        notFound();
+    }
+    
     return (
         <div className="min-h-screen bg-linear-to-b from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-950 dark:to-black py-12">
             <main className="mx-auto w-full max-w-6xl px-4 sm:px-6">
@@ -15,7 +39,7 @@ export default function DashboardSellers() {
                                 Revisa y administra los vendedores registrados. Encuentra detalles, historial y estado de cada cuenta.
                             </p>
                         </div>
-                        <SellerList />
+                        <SellerList page={validatedPage} sellerCount={sellerCount} sellers={sellers}/>
                     </div>
                 </section>
             </main>

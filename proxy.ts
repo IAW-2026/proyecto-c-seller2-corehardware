@@ -39,11 +39,11 @@ export default clerkMiddleware(async (auth, request) => {
         const clerkId = (await auth()).sessionClaims?.sub;
         const sellerId = await checkUser(clerkId);
         const pathSegments = new URL(request.url).pathname.split('/');
-        const pathSellerId = Number(pathSegments[2]);
-        if( !sellerId || sellerId !== pathSellerId){
+        const pathSellerId = pathSegments[2] ?? "";
+        if (!sellerId || sellerId !== pathSellerId) {
             const url = new URL('/seller', request.url);
             return NextResponse.redirect(url);
-        }  
+        }
     }
 })
 
