@@ -28,7 +28,7 @@ async function main() {
   await prisma.seller.update({
     where: { id: seller1.id },
     data: {
-      ClerkUserId: "user_3EXu6xpTDNsXy8898piNAyHxgNQ",
+      ClerkUserId: "user_3FKejpiVCZOvNA8H8yODqd2Dge2",
     },
   });
   const seller2 = await prisma.seller.create({
@@ -45,7 +45,7 @@ async function main() {
   await prisma.seller.update({
     where: { id: seller2.id },
     data: {
-      ClerkUserId: "user_3FKG17SFEGr9IMqovqntgP19sql",
+      ClerkUserId: "user_3FKf1K6dzkCdDCeNsvBZGsO9hqI",
     },
   });
 

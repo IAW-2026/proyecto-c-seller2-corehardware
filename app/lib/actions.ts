@@ -142,9 +142,9 @@ type getProductsFilteredRequestType = {
 }
 
 export async function getProductsFiltered(parameters:getProductsFilteredRequestType){
-    const seller = await prisma.seller.findFirst({
+    const seller = parameters.seller ? await prisma.seller.findFirst({
         where : {name : parameters.seller, isDeleted: false}
-    })
+    }) : null;
     if(parameters.sellerId && seller){
         if(parameters.sellerId !== seller.id){
             throw new ValidationError("El ID del vendedor no coincide con el nombre del vendedor proporcionado.");
