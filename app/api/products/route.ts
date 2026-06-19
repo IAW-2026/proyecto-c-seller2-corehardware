@@ -13,7 +13,7 @@ const getProductsFilteredSchema = z.object({
     brand: z.string().optional(),
     seller: z.string().optional(),
     sellerId: z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional(),
-    hasStock: z.boolean().optional()    
+    hasStock: z.coerce.boolean().optional()    
 })
 
 export async function GET(request:NextRequest){
