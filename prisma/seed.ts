@@ -45,7 +45,7 @@ async function main() {
   await prisma.seller.update({
     where: { id: seller2.id },
     data: {
-      ClerkUserId: "user_3EXuD6o8wEumE6m152BeCPrjNd7",
+      ClerkUserId: "user_3FKG17SFEGr9IMqovqntgP19sql",
     },
   });
 

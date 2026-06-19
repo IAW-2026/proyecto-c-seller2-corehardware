@@ -229,7 +229,8 @@ function prismaSellerToForeignSeller(prismaSeller:Prisma.SellerModel){
         direccion: prismaSeller.address,
         mail: prismaSeller.email,
         celular: prismaSeller.phoneNumber,
-        condicion_iva: prismaSeller.VATCondition
+        condicion_iva: prismaSeller.VATCondition,
+        id_clerk: prismaSeller.ClerkUserId
     }
 }
 
