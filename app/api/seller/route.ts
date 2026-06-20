@@ -31,14 +31,11 @@ export async function GET() {
     } else{
         try{
             const { sub } = await verifyToken(token);
-            console.log(sub);
             const id = await checkUser(sub);
-            console.log(id);
             if( !id ) return new Response(JSON.stringify({message:"No se pudo encontrar al vendedor"}), { status: 404 });
             const foreignSeller = await getSeller({ id: id }); 
             return new Response(JSON.stringify(foreignSeller), { status: 200 });        
         } catch(e){
-            console.log(e);
             if ( e instanceof JOSEError) return new Response(JSON.stringify({ message: 'Acceso no autorizado' }), { status: 401 });
             return new Response(JSON.stringify({message:"No se pudo encontrar al vendedor"}), { status: 404 })    
         }    
