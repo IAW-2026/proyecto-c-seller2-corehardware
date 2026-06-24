@@ -1,6 +1,6 @@
 "use client";
 
-import { Show, SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
+import { Show, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -61,6 +61,10 @@ export default function Home() {
                       Sign Up
                     </button>
                   </SignUpButton>
+                </Show>
+                <Show when="signed-in">
+                  {(role !== 'admin' && role!=='seller') && <p className="max-w-xl text-base leading-7 text-red-600 dark:text-red-400"> Usted está logueado con un usuario de la webapp incorrecta, cierre sesión e ingrese con un usuario de esta webapp </p>}
+                  < UserButton />
                 </Show>
               </div>
             </div>
