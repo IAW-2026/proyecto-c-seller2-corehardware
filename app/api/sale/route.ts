@@ -71,8 +71,8 @@ export async function POST(request:NextRequest) {
         return new Response(JSON.stringify({message: shipment.message}) , { status: response.status })
     }
 
-    const URL2 = `https://proyecto-c-buyer2-corehardware-it19lxr52.vercel.app/api/orders/${data.id}/status`;
-    await fetch(URL2, {
+    const URL2 = `https://proyecto-c-buyer2-corehardw-git-eb8088-yanina-rivera-s-projects.vercel.app/api/orders/${data.id}/status`;
+    const response2 = await fetch(URL2, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -80,6 +80,11 @@ export async function POST(request:NextRequest) {
         },
         body: JSON.stringify({ estado: "EN_PREPARACION" }),
     });
+
+    const orderStatus = await response2.json();
+    if(orderStatus.message){
+        console.error("Error al actualizar el estado del pedido en la API del comprador:", orderStatus.message);
+    }
 
     return new Response(JSON.stringify(validatedData.data), { status: 201})
 }
