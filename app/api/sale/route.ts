@@ -56,6 +56,7 @@ export async function POST(request:NextRequest) {
     } catch(err){
         return new Response(JSON.stringify({message: "Error del servidor, no se pudo crear venta."}),{ status:500 });
     }
+
     const URL = "https://proyecto-c-shipping2-corehardware.vercel.app/api/shipment";
     const response = await fetch(URL, {
             method: "POST",
@@ -69,5 +70,16 @@ export async function POST(request:NextRequest) {
     if(shipment.message){
         return new Response(JSON.stringify({message: shipment.message}) , { status: response.status })
     }
+
+    const URL2 = `https://proyecto-c-buyer2-corehardware-it19lxr52.vercel.app/api/orders/${data.id}/status`;
+    await fetch(URL2, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": process.env.BUYER_API_KEY || "",
+        },
+        body: JSON.stringify({ estado: "EN_PREPARACION" }),
+    });
+
     return new Response(JSON.stringify(validatedData.data), { status: 201})
 }
