@@ -225,6 +225,22 @@ export async function getSellerDetails(id:string) {
     return prismaSellerToSeller(seller);
 }
 
+export async function getSellers() {
+    const sellers = await prisma.seller.findMany({
+            where: { isDeleted: false },
+            select: {
+                id: true,
+                name: true,
+                CUIT: true,
+                email: true,
+                phoneNumber: true,
+                VATCondition: true,
+            },
+            orderBy: { name: "asc" },
+        });
+    return sellers;
+}
+
 export type SellerNameId = {
     id: string;
     name: string;
@@ -494,6 +510,20 @@ function prismaSaleToSaleDetails(prismaSale: { id: string; date: Date; totalPric
         sellerName: sellerName,
         products: products
     };
+}
+
+export async function getForeignSales(){
+    const sales = await prisma.sale.findMany({
+            where: { isDeleted: false },
+            select: {
+                id: true,
+                date: true,
+                sellerId: true,
+                totalPrice: true,
+            },
+            orderBy: { date: "desc" },
+        });
+    return sales;
 }
 
 export async function getSales(sellerId?: string): Promise<SaleDetails[]> {
