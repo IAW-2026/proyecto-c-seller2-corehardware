@@ -13,6 +13,7 @@ export default async function DashboardPersonalizedSellerPage({ params }: { para
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{sellerDetails.name}</h1>
+                            <p className="mt-1 text-sm text-zinc-500">ID de vendedor: <span className="font-medium text-zinc-700 dark:text-zinc-300">{id}</span></p>
                             <p className="mt-1 text-sm text-zinc-500">CUIT: <span className="font-medium text-zinc-700 dark:text-zinc-300">{sellerDetails.CUIT}</span></p>
                         </div>
                         <div className="flex gap-3">

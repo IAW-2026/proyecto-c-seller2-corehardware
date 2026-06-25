@@ -25,12 +25,6 @@ export default async function ProductPage({ params }: { params: { id: string; pr
             <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-white">{product.name}</h1>
             <p className="mt-1 text-sm text-gray-600 dark:text-zinc-400">Vendedor ID: {product.sellerId}</p>
           </div>
-          <Link
-            href={`/seller/${id}`}
-            className="inline-flex items-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-          >
-            Volver a la Página del Vendedor
-          </Link>
         </header>
         <div className="grid gap-3">
 

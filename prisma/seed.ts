@@ -18,7 +18,7 @@ async function main() {
     data: {
       name: "CompuMundo",
       CUIT: "20-12345678-9",
-      email: "seller1+clerk_test@example.com",
+      email: "seller_created_1+clerk_test@iaw.com",
       phoneNumber: "1234567890",
       address: "123 Main St, City, Country",
       startOfActivities: new Date("2020-01-01"),
@@ -28,14 +28,14 @@ async function main() {
   await prisma.seller.update({
     where: { id: seller1.id },
     data: {
-      ClerkUserId: "user_3EXu6xpTDNsXy8898piNAyHxgNQ",
+      ClerkUserId: "user_3FKejpiVCZOvNA8H8yODqd2Dge2",
     },
   });
   const seller2 = await prisma.seller.create({
     data: {
       name: "TechHub",
       CUIT: "27-98765432-1",
-      email: "seller2+clerk_test@example.com",
+      email: "seller_created_2+clerk_test@iaw.com",
       phoneNumber: "0987654321",
       address: "456 Elm St, City, Country",
       startOfActivities: new Date("2021-06-15"),
@@ -45,7 +45,7 @@ async function main() {
   await prisma.seller.update({
     where: { id: seller2.id },
     data: {
-      ClerkUserId: "user_3FKG17SFEGr9IMqovqntgP19sql",
+      ClerkUserId: "user_3FKf1K6dzkCdDCeNsvBZGsO9hqI",
     },
   });
 
@@ -53,7 +53,7 @@ async function main() {
     data: {
       name: "Juan Perez",
       CUIT: "30-59403294-3",
-      email: "seller2+clerk_test@example.com",
+      email: "juan_perez@example.com",
       phoneNumber: "3454333436364",
       address: "345 Oak St, City, Country",
       startOfActivities: new Date("2023-06-15"),

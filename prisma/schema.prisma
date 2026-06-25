@@ -26,6 +26,7 @@ model Product {
   stock          Int
   image          String
   isDeleted      Boolean         @default(false)
+  isListed       Boolean         @default(true)
   productOnSales ProductOnSale[]
 }
 

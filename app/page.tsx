@@ -1,21 +1,38 @@
 "use client";
 
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
-import RoleBasedRedirectButton from '@ui/buttons/roleBasedRedirectButton';
+import { Show, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function Home() {
+  const router = useRouter();
+  const { isLoaded, isSignedIn, user } = useUser();
+
   useEffect(() => {
-    const handlePageShow = (e: PageTransitionEvent) => {
-      // Only reload if page was restored from bfcache
-      if (e.persisted) {
-        window.location.reload();
-      }
-    };
-    
-    window.addEventListener('pageshow', handlePageShow as EventListener);
-    return () => window.removeEventListener('pageshow', handlePageShow as EventListener);
-  }, []);
+    if (!isLoaded || !isSignedIn || !user) return;
+
+    const role = user.publicMetadata?.role;
+
+    if (role === 'admin') {
+      router.replace('/dashboard');
+      return;
+    }
+
+    if (role === 'seller') {
+      router.replace('/seller');
+    }
+  }, [isLoaded, isSignedIn, router, user]);
+
+  if (!isLoaded) {
+    return null;
+  }
+
+  const role = user?.publicMetadata?.role;
+
+  if (isSignedIn && (role === 'admin' || role === 'seller')) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-950 dark:to-black py-12">
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 sm:px-6">
@@ -45,12 +62,9 @@ export default function Home() {
                     </button>
                   </SignUpButton>
                 </Show>
-
                 <Show when="signed-in">
-                  <div className="flex flex-wrap items-center justify-center gap-4 sm:justify-start">
-                    <UserButton />
-                    <RoleBasedRedirectButton />
-                  </div>
+                  {(role !== 'admin' && role!=='seller') && <p className="max-w-xl text-base leading-7 text-red-600 dark:text-red-400"> Usted está logueado con un usuario de la webapp incorrecta, cierre sesión e ingrese con un usuario de esta webapp </p>}
+                  < UserButton />
                 </Show>
               </div>
             </div>
@@ -68,5 +82,4 @@ export default function Home() {
     </div>
   );
 }
-
 
