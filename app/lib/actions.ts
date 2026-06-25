@@ -166,7 +166,7 @@ type getProductsFilteredRequestType = {
 
 export async function getProductsFiltered(parameters:getProductsFilteredRequestType){
     const seller = parameters.seller ? await prisma.seller.findFirst({
-        where : {name : parameters.seller, isDeleted: false}
+        where : {name : { contains: parameters.seller, mode: "insensitive" }, isDeleted: false}
     }) : null;
     if(parameters.sellerId && seller){
         if(parameters.sellerId !== seller.id){
@@ -177,7 +177,7 @@ export async function getProductsFiltered(parameters:getProductsFilteredRequestT
     const greaterThan = parameters.hasStock ? 0 : undefined;
     const filteredProducts = await prisma.product.findMany({
         where:{
-            name : parameters.name,
+            name : parameters.name ? { contains: parameters.name, mode: "insensitive" } : undefined,
             brand : parameters.brand,
             sellerId : sellerId,
             stock : {
