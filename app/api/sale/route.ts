@@ -56,7 +56,7 @@ export async function POST(request:NextRequest) {
     } catch(err){
         return new Response(JSON.stringify({message: "Error del servidor, no se pudo crear venta."}),{ status:500 });
     }
-    const URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/api/shipment` : "http://localhost:3000/api/shipment";
+    const URL = "https://proyecto-c-shipping2-corehardware.vercel.app/api/shipment";
     const response = await fetch(URL, {
             method: "POST",
             headers: {
