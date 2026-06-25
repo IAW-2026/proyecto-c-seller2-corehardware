@@ -7,6 +7,7 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { clerkClient, auth } from "@clerk/nextjs/server";
 import { ValidationError } from "./errors";
+import { fa } from "zod/locales";
 
 
 export type Product = {
@@ -131,6 +132,28 @@ export async function getProductCount(sellerID?:string){
     return await prisma.product.count({where: {isDeleted:false, sellerId: sellerID}})
 }
 
+export async function unlistProduct(id:string){
+    await prisma.product.update({
+        where: {id, isDeleted: false},
+        data: { isListed:false }
+    });
+}
+
+export async function relistProduct(id:string){
+    await prisma.product.update({
+        where: {id, isDeleted: false},
+        data: { isListed:true }
+    });
+}
+
+export async function isListed(id:string){
+    const product = await prisma.product.findUniqueOrThrow({
+        where: {id, isDeleted: false},
+        select: { isListed:true }
+    });
+    return product.isListed;
+}
+
 type getProductsFilteredRequestType = {
     offset?:number,
     limit?:number,
@@ -161,6 +184,7 @@ export async function getProductsFiltered(parameters:getProductsFilteredRequestT
                 gte: greaterThan
             },
             isDeleted:false,
+            isListed:true,
         },
         skip: parameters.offset,
         take: parameters.limit
@@ -214,6 +238,8 @@ export async function getSellerNamesIds(limit:number, page:number) {
     });
     return sellers.map((seller) => ({ name: seller.name, id: seller.id }));
 }
+
+
 
 export async function getSellerCount() {
     return await prisma.seller.count({ where: { isDeleted: false }});
