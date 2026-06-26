@@ -7,7 +7,7 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { clerkClient, auth } from "@clerk/nextjs/server";
 import { ValidationError } from "./errors";
-import { fa } from "zod/locales";
+
 
 
 export type Product = {
@@ -497,18 +497,21 @@ export type SaleDetails = {
     id: string;
     date: Date;
     totalPrice: string;
+    priceWithoutShipping: string;
     sellerName: string;
     products: string;
 }
 
-function prismaSaleToSaleDetails(prismaSale: { id: string; date: Date; totalPrice: Prisma.Decimal }, sellerName: string, productsOnSale: { product: { name: string; }; productId: string; productAmount: number; }[]): SaleDetails {
+async function prismaSaleToSaleDetails(prismaSale: { id: string; date: Date; totalPrice: Prisma.Decimal }, sellerName: string, productsOnSale: { product: { name: string; }; productId: string; productAmount: number; }[]): Promise<SaleDetails> {
     const products = productsOnSale.map((pos) => ` "${pos.product.name}" X ${pos.productAmount}`).join(", ");
+    const priceWithoutShipping = await getSaleValueWithoutShipping(prismaSale.id);
     return {
         id: prismaSale.id,
         date: prismaSale.date,
         totalPrice: prismaSale.totalPrice.toString(),
+        priceWithoutShipping: priceWithoutShipping,
         sellerName: sellerName,
-        products: products
+        products: products,
     };
 }
 
@@ -555,7 +558,7 @@ export async function getSales(sellerId?: string): Promise<SaleDetails[]> {
                 }
             }
         });
-        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+        return await prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
     }));
 }
 
@@ -570,6 +573,27 @@ export async function getTotalSalesValue(sellerId?: string): Promise<string> {
     });
     return totalSalesValue._sum.totalPrice ? totalSalesValue._sum.totalPrice.toString() : "0";
 }
+
+export async function getSaleValueWithoutShipping(saleId: string): Promise<string> {
+    const schemaId = z.string().cuid({ message: "El ID de la venta debe ser un cuid válido" });
+    const validSaleId = schemaId.parse(saleId);
+    const productsOnSale = await prisma.productOnSale.findMany({
+        where: { saleId: validSaleId },
+        select: {
+            productAmount: true,
+            product: {
+                select: {
+                    price: true,
+                }
+            }
+        }
+    });
+    const totalValue = productsOnSale.reduce((acc, pos) => {
+        return acc + pos.product.price.toNumber() * pos.productAmount;
+    }, 0);
+    return totalValue.toString();
+}
+
 
 export async function getSalesOnPeriod(startDate: string, endDate: string,sellerId?: string): Promise<SaleDetails[]> {
     const schemaId = z.string().cuid({ message: "El ID del vendedor debe ser un cuid válido" }).optional();
@@ -614,7 +638,7 @@ export async function getSalesOnPeriod(startDate: string, endDate: string,seller
                 }
             }
         });
-        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+        return await prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
     }));
 }
 
@@ -680,7 +704,7 @@ export async function getLastSales(limit: number, sellerId?: string): Promise<Sa
                 }
             }
         });
-        return prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
+        return await prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
     }));
 }    
 
