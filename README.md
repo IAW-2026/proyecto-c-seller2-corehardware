@@ -30,7 +30,7 @@ Enunciado completo: <https://iaw-2026.github.io/proyecto/>
 
 **3. Instrucciones**: Usar el usuario seller con seller creado 1 para testear las funcionalidades normales de seller, usuario seller con seller creado 2 está para testear la funcionalidad de borrar cuenta, que elimina el seller , todos sus productos y ventas y el usuario de clerk. El usuario seller sin seller creado es para testear la creación de usuario, que no funciona automáticamente en este deploy.
 
-**4. Descripción del proyecto**: El administrador puede crear, modificar y eliminar productos (puede filtrar por vendedor accediendo desde el panel del vendedor o usando parámetros de búsqueda), ver los detalles de los vendedores y generar un reporte de ventas. 
-El vendedor puede publicar productos y ver sus productos, puede aumentar stock y cambiar el precio, descripción o imagen de un producto, puede generar un reporte de sus ventas y borrar su usuario. 
+**4. Descripción del proyecto**: El administrador puede crear, modificar, eliminar y deslistar productos (puede filtrar por vendedor accediendo desde el panel del vendedor o usando parámetros de búsqueda), ver los detalles de los vendedores y generar un reporte de últimas ventas, ventas por período y todas las ventas. 
+El vendedor puede publicar productos, ver y deslistar sus productos, puede aumentar stock y cambiar el precio, descripción o imagen de un producto, puede generar un reporte de sus últimas ventas, ventas por período y todas sus ventas; y borrar su usuario. 
 
-**5. Notas**: El Webhook de Clerk que asigna automáticamente el rol de seller a un usuario no se puede testear porque Clerk no acepta dominios de Vercel. Funcionalidades que pienso implementar para la próxima etapa: [documentation\FeaturesToImplement.md](documentation\FeaturesToImplement.md)
+**5. Notas**: El Webhook de Clerk que asigna automáticamente el rol de seller a un usuario no se puede testear porque Clerk no acepta dominios de Vercel. 
