@@ -71,7 +71,7 @@ export async function POST(request:NextRequest) {
         return new Response(JSON.stringify({message: shipment.message}) , { status: response.status })
     }
 
-    const URL2 = `https://proyecto-c-buyer2-corehardw-git-eb8088-yanina-rivera-s-projects.vercel.app/api/orders/${data.id}/status`;
+    const URL2 = `https://proyecto-c-buyer2-corehardware.vercel.app/api/orders/${data.id}/status`;
     const response2 = await fetch(URL2, {
         method: "PUT",
         headers: {
