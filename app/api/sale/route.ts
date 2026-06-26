@@ -56,7 +56,8 @@ export async function POST(request:NextRequest) {
     } catch(err){
         return new Response(JSON.stringify({message: "Error del servidor, no se pudo crear venta."}),{ status:500 });
     }
-    const URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/api/shipment` : "http://localhost:3000/api/shipment";
+
+    const URL = "https://proyecto-c-shipping2-corehardware.vercel.app/api/shipment";
     const response = await fetch(URL, {
             method: "POST",
             headers: {
@@ -69,5 +70,21 @@ export async function POST(request:NextRequest) {
     if(shipment.message){
         return new Response(JSON.stringify({message: shipment.message}) , { status: response.status })
     }
+
+    const URL2 = `https://proyecto-c-buyer2-corehardw-git-eb8088-yanina-rivera-s-projects.vercel.app/api/orders/${data.id}/status`;
+    const response2 = await fetch(URL2, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": process.env.BUYER_API_KEY || "",
+        },
+        body: JSON.stringify({ estado: "EN_PREPARACION" }),
+    });
+
+    const orderStatus = await response2.json();
+    if(orderStatus.message){
+        console.error("Error al actualizar el estado del pedido en la API del comprador:", orderStatus.message);
+    }
+
     return new Response(JSON.stringify(validatedData.data), { status: 201})
 }

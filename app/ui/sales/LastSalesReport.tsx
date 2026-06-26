@@ -2,13 +2,17 @@ import { getLastSales, SaleDetails } from "@lib/actions";
 
 export default async function SalesReport({ limit, sellerId=undefined }: { limit: number, sellerId?:string }) {
     const sales: SaleDetails[] = sellerId ? await getLastSales(limit,sellerId) : await getLastSales(limit);
-    const totalSalesValue = (sales.map(sale => parseFloat(sale.totalPrice)*100).reduce((sum,current) => sum + current,0.00) / 100).toString();
+    const totalSalesValue = (sales.map(sale => parseFloat(sale.totalPrice) * 100).reduce((sum, current) => sum + current, 0.00) / 100).toString();
+    const totalSalesValueWithoutShipping = (sales.map(sale => parseFloat(sale.priceWithoutShipping) * 100).reduce((sum, current) => sum + current, 0.00) / 100).toString();
 
     return (
         <div className="space-y-6">
             <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
                 <h2 className="text-sm text-zinc-500">Valor Total de Ventas</h2>
-                <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{totalSalesValue}</p>
+                <div className="mt-2 space-y-1">
+                    <p className="text-2xl font-semibold text-gray-900 dark:text-white">${totalSalesValue}</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Sin envío: ${totalSalesValueWithoutShipping}</p>
+                </div>
             </div>
 
             <div className="grid gap-4">
@@ -19,9 +23,15 @@ export default async function SalesReport({ limit, sellerId=undefined }: { limit
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Venta con Id: {sale.id}</h3>
                                 <p className="mt-1 text-sm text-zinc-500">{sale.sellerName} • {sale.date.toLocaleDateString()}</p>
 
-                                <div className="mt-3 text-sm text-zinc-700 dark:text-zinc-300">
-                                    <strong>Total: </strong>
-                                    <span className="font-medium">{sale.totalPrice}</span>
+                                <div className="mt-3 space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                                    <div>
+                                        <strong>Con envío: </strong>
+                                        <span className="font-medium">${sale.totalPrice}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Sin envío: </strong>
+                                        <span className="font-medium">${sale.priceWithoutShipping}</span>
+                                    </div>
                                 </div>
 
                                 <div className="mt-3">

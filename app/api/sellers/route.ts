@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { createSeller } from "@/app/lib/actions";
+import { createSeller, getSellers } from "@/app/lib/actions";
+import { headers } from "next/headers";
 
 const createSellerSchema = z.object({
     name: z.string(),
@@ -33,8 +34,24 @@ export async function POST(request: NextRequest) {
         response.headers.set("Location", sellerUrl);
         return response;
     } catch (e) {
-        console.log(e);
         return new Response(JSON.stringify({ message: 'Error interno del servidor. No se pudo crear el vendedor.' }), { status: 500 });
     }
 }
-    
+
+
+export async function GET() {
+    const requestHeaders = await headers();
+    const apiKey = requestHeaders.get("X-API-Key");
+
+    if (apiKey !== process.env.NEXT_PUBLIC_PRIVATE_API_KEY) {
+        return new Response(JSON.stringify({ message: 'Acceso no autorizado' }), { status: 401 });
+    }
+
+    try {
+        const sellers = await getSellers();
+        return new Response(JSON.stringify(sellers), { status: 200 });
+    } catch (e) {
+        return new Response(JSON.stringify({ message: 'Error interno del servidor. No se pudieron obtener los vendedores.' }), { status: 500 });
+    }
+
+}
