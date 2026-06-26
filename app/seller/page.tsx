@@ -38,7 +38,6 @@ export default function SellerPage() {
                     setHasSeller(true);
                     setIsCheckingSeller(false);
                     router.replace(targetPath);
-                    window.location.assign(targetPath);
                     return;
                 }
 

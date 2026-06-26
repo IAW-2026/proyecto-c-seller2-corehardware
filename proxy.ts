@@ -30,19 +30,26 @@ export default clerkMiddleware(async (auth, request) => {
     return NextResponse.redirect(url);
     }
     
-    if (isSellerRoute(request) && (await auth()).sessionClaims?.metadata?.role !== 'seller') {
+    const authData = await auth();
+    const userRole = authData.sessionClaims?.metadata?.role;
+
+    if (isSellerRoute(request) && userRole && userRole !== 'seller') {
     const url = new URL('/', request.url);
     return NextResponse.redirect(url);
     }
 
     if(isSellerProfileRoute(request)){
-        const clerkId = (await auth()).sessionClaims?.sub;
-        const sellerId = await checkUser(clerkId);
-        const pathSegments = new URL(request.url).pathname.split('/');
-        const pathSellerId = pathSegments[2] ?? "";
-        if (!sellerId || sellerId !== pathSellerId) {
-            const url = new URL('/seller', request.url);
-            return NextResponse.redirect(url);
+        const clerkId = authData.sessionClaims?.sub;
+        try {
+            const sellerId = clerkId ? await checkUser(clerkId) : undefined;
+            const pathSegments = new URL(request.url).pathname.split('/');
+            const pathSellerId = pathSegments[2] ?? "";
+            if (sellerId && sellerId !== pathSellerId) {
+                const url = new URL('/seller', request.url);
+                return NextResponse.redirect(url);
+            }
+        } catch (error) {
+            console.error('Error verifying seller profile in middleware:', error);
         }
     }
 })
