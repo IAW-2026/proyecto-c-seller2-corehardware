@@ -744,5 +744,26 @@ export async function deleteSeller(id:string){
     redirect('/deleted-account');
 }
 
+type UpdateSellerRequestType = {
+    id: string;
+    name?: string;
+    CUIT?: string;
+    address?: string;
+    email?: string;
+    phoneNumber?: string;
+    startOfActivities?: Date;
+    VATCondition?: string;
+}
+
+export async function updateSeller(validatedData: UpdateSellerRequestType) {
+    const { id, ...updateData } = validatedData;
+    const updatedSeller = await prisma.seller.update({
+        where: { id, isDeleted: false },
+        data: updateData,
+    });
+    revalidatePath(`/seller/${updatedSeller.id}`);
+    return updatedSeller;
+}
+
 
 
