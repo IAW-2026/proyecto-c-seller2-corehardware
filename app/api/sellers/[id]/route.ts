@@ -34,6 +34,7 @@ const updateSellerSchema = z.object({
     direccion: z.string().optional(),
     mail: z.string().email({ message: "El correo electrónico debe ser válido" }).optional(),
     celular: z.string().optional(),
+    condicion_iva: z.string().optional(),
 }).strict();
  
 export async function PATCH(request: NextRequest, {params}: {params: Promise<{ id: string }>}) {
@@ -55,9 +56,9 @@ export async function PATCH(request: NextRequest, {params}: {params: Promise<{ i
     if (!validatedData.success) {
         return new Response(JSON.stringify({ errors: validatedData.error.flatten().fieldErrors, message: 'Datos de entrada inválidos. No se pudo actualizar el vendedor.' }), { status: 400 });
     }
- 
-    const { razon_social, direccion, mail, celular } = validatedData.data;
- 
+
+    const { razon_social, direccion, mail, celular, condicion_iva } = validatedData.data;
+
     try {
         const updated = await updateSeller({
             id,
@@ -65,6 +66,7 @@ export async function PATCH(request: NextRequest, {params}: {params: Promise<{ i
             ...(direccion !== undefined ? { address: direccion } : {}),
             ...(mail !== undefined ? { email: mail } : {}),
             ...(celular !== undefined ? { phoneNumber: celular } : {}),
+            ...(condicion_iva !== undefined ? { VATCondition: condicion_iva } : {}),
         });
         return new Response(JSON.stringify(updated), { status: 200 });
     } catch (e) {

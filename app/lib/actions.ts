@@ -796,6 +796,7 @@ type UpdateSellerRequestType = {
     address?: string;
     email?: string;
     phoneNumber?: string;
+    VATCondition?: string;
 }
  
 export async function updateSeller(validatedData: UpdateSellerRequestType) {
