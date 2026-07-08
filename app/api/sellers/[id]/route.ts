@@ -30,10 +30,10 @@ export async function GET(request: NextRequest, {params}: {params: Promise<{ id:
 }
 
 const updateSellerSchema = z.object({
-    name: z.string().optional(),
-    address: z.string().optional(),
-    email: z.string().email({ message: "El correo electrónico debe ser válido" }).optional(),
-    phoneNumber: z.string().optional(),
+    razon_social: z.string().optional(),
+    direccion: z.string().optional(),
+    mail: z.string().email({ message: "El correo electrónico debe ser válido" }).optional(),
+    celular: z.string().optional(),
 }).strict();
  
 export async function PATCH(request: NextRequest, {params}: {params: Promise<{ id: string }>}) {
@@ -56,8 +56,16 @@ export async function PATCH(request: NextRequest, {params}: {params: Promise<{ i
         return new Response(JSON.stringify({ errors: validatedData.error.flatten().fieldErrors, message: 'Datos de entrada inválidos. No se pudo actualizar el vendedor.' }), { status: 400 });
     }
  
+    const { razon_social, direccion, mail, celular } = validatedData.data;
+ 
     try {
-        const updated = await updateSeller({ id, ...validatedData.data });
+        const updated = await updateSeller({
+            id,
+            ...(razon_social !== undefined ? { name: razon_social } : {}),
+            ...(direccion !== undefined ? { address: direccion } : {}),
+            ...(mail !== undefined ? { email: mail } : {}),
+            ...(celular !== undefined ? { phoneNumber: celular } : {}),
+        });
         return new Response(JSON.stringify(updated), { status: 200 });
     } catch (e) {
         return new Response(JSON.stringify({ message: "No se pudo encontrar al vendedor" }), { status: 404 });
