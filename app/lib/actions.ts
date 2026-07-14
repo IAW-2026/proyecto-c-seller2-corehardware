@@ -805,25 +805,69 @@ export async function deleteSeller(id:string){
     redirect('/deleted-account');
 }
 
+
+
+function prismaSellerToPaginatedSeller(prismaSeller: Prisma.SellerModel) {
+    return {
+        id: prismaSeller.id,
+        cuit: prismaSeller.CUIT,
+        razon_social: prismaSeller.name,
+        direccion: prismaSeller.address,
+        mail: prismaSeller.email,
+        celular: prismaSeller.phoneNumber,
+        condicion_iva: prismaSeller.VATCondition,
+    }
+}
+ 
+type GetSellersPaginatedParams = {
+    q?: string;
+    offset?: number;
+    limit?: number;
+}
+ 
+export async function getSellersPaginated(params: GetSellersPaginatedParams) {
+    const { q, offset = 0, limit } = params;
+ 
+    const where = {
+        isDeleted: false,
+        ...(q ? { id: { contains: q, mode: "insensitive" as const } } : {}),
+    };
+ 
+    const [sellers, total] = await Promise.all([
+        prisma.seller.findMany({
+            where,
+            orderBy: { name: "asc" },
+            skip: offset,
+            ...(limit !== undefined ? { take: limit } : {}),
+        }),
+        prisma.seller.count({ where }),
+    ]);
+ 
+    return {
+        sellers: sellers.map(prismaSellerToPaginatedSeller),
+        total,
+        offset,
+        limit: limit ?? total,
+    };
+}
+ 
 type UpdateSellerRequestType = {
     id: string;
     name?: string;
-    CUIT?: string;
     address?: string;
     email?: string;
     phoneNumber?: string;
-    startOfActivities?: Date;
     VATCondition?: string;
 }
-
+ 
 export async function updateSeller(validatedData: UpdateSellerRequestType) {
-    const { id, ...updateData } = validatedData;
-    const updatedSeller = await prisma.seller.update({
-        where: { id, isDeleted: false },
-        data: updateData,
+    const { id, ...data } = validatedData;
+    await prisma.seller.findUniqueOrThrow({ where: { id, isDeleted: false } });
+    const seller = await prisma.seller.update({
+        where: { id },
+        data,
     });
-    revalidatePath(`/seller/${updatedSeller.id}`);
-    return updatedSeller;
+    return prismaSellerToPaginatedSeller(seller);
 }
 
 
