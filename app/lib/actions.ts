@@ -760,17 +760,22 @@ export async function getBestSellingProducts(limit: number, sellerId?: string): 
         },
     });
 
-    const bestSelling: BestSellingProduct[] = soldProducts.map((product) => {
-        const totalSold = productIds.find((p) => p.productId === product.id)?._sum.productAmount || 0;
-        return {
-            name: product.name,
-            brand: product.brand,
-            model: product.model,
-            price: product.price.toString(),
-            sellerName: product.seller.name,
-            totalSold: totalSold,
-        };
-    });
+    const productById = new Map(soldProducts.map((product) => [product.id, product]));
+
+    const bestSelling: BestSellingProduct[] = productIds
+        .map((productIdEntry) => productById.get(productIdEntry.productId))
+        .filter((product): product is typeof soldProducts[number] => Boolean(product))
+        .map((product) => {
+            const totalSold = productIds.find((p) => p.productId === product.id)?._sum.productAmount || 0;
+            return {
+                name: product.name,
+                brand: product.brand,
+                model: product.model,
+                price: product.price.toString(),
+                sellerName: product.seller.name,
+                totalSold: totalSold,
+            };
+        });
 
     if (bestSelling.length >= limit) {
         return bestSelling;
