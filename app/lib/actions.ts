@@ -706,7 +706,68 @@ export async function getLastSales(limit: number, sellerId?: string): Promise<Sa
         });
         return await prismaSaleToSaleDetails({ id: sale.id, date: sale.date, totalPrice: sale.totalPrice }, sale.seller.name, productsOnSale);
     }));
-}    
+}
+
+type BestSellingProduct = {
+    name: string;
+    brand: string;
+    model: string;
+    price: string;
+    sellerName: string;
+    totalSold: number;
+}
+
+export async function getBestSellingProducts(limit: number, sellerId?: string): Promise<BestSellingProduct[]> {
+    const productIds = await prisma.productOnSale.groupBy({
+        by: ['productId'],
+        where: {
+            product: {
+                sellerId: sellerId,
+                isDeleted: false,
+            },
+        },
+        _sum: {
+            productAmount: true,
+        },
+        orderBy: {
+            _sum: {
+                productAmount: 'desc',
+            },
+        },
+        take: limit,
+    });
+    const products = await prisma.product.findMany({
+        where: {
+            id: {
+                in: productIds.map((p) => p.productId),
+            },
+            isDeleted: false,
+        },
+        select: {
+            id: true,
+            name: true,
+            brand: true,
+            model: true,
+            price: true,
+            seller: {
+                select: {
+                    name: true,
+                },
+            }
+        },
+    });
+    return products.map((product) => {
+        const totalSold = productIds.find((p) => p.productId === product.id)?._sum.productAmount || 0;
+        return {
+            name: product.name,
+            brand: product.brand,
+            model: product.model,
+            price: product.price.toString(),
+            sellerName: product.seller.name,
+            totalSold: totalSold,
+        };
+    });
+}
 
 
 
