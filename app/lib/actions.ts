@@ -736,10 +736,13 @@ export async function getBestSellingProducts(limit: number, sellerId?: string): 
         },
         take: limit,
     });
-    const products = await prisma.product.findMany({
+
+    const soldProductIds = productIds.map((p) => p.productId);
+
+    const soldProducts = await prisma.product.findMany({
         where: {
             id: {
-                in: productIds.map((p) => p.productId),
+                in: soldProductIds,
             },
             isDeleted: false,
         },
@@ -756,7 +759,8 @@ export async function getBestSellingProducts(limit: number, sellerId?: string): 
             }
         },
     });
-    return products.map((product) => {
+
+    const bestSelling: BestSellingProduct[] = soldProducts.map((product) => {
         const totalSold = productIds.find((p) => p.productId === product.id)?._sum.productAmount || 0;
         return {
             name: product.name,
@@ -767,6 +771,46 @@ export async function getBestSellingProducts(limit: number, sellerId?: string): 
             totalSold: totalSold,
         };
     });
+
+    if (bestSelling.length >= limit) {
+        return bestSelling;
+    }
+
+    const remaining = limit - bestSelling.length;
+    const unsoldProducts = await prisma.product.findMany({
+        where: {
+            isDeleted: false,
+            sellerId: sellerId,
+            id: {
+                notIn: soldProductIds,
+            },
+        },
+        select: {
+            id: true,
+            name: true,
+            brand: true,
+            model: true,
+            price: true,
+            seller: {
+                select: {
+                    name: true,
+                },
+            }
+        },
+        take: remaining,
+        orderBy: { name: 'asc' },
+    });
+
+    const unsoldBestSelling = unsoldProducts.map((product) => ({
+        name: product.name,
+        brand: product.brand,
+        model: product.model,
+        price: product.price.toString(),
+        sellerName: product.seller.name,
+        totalSold: 0,
+    }));
+
+    return [...bestSelling, ...unsoldBestSelling];
 }
 
 
