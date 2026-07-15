@@ -15,8 +15,8 @@ export async function GET(request: Request) {
     }
 
     try {
-        const sales = await getForeignSales(limit, offset);
-        return new Response(JSON.stringify(sales), { status: 200 });
+        const { sales, total } = await getForeignSales(limit, offset);
+        return new Response(JSON.stringify({ sales, total }), { status: 200 });
     } catch (e) {
         return new Response(JSON.stringify({ message: 'Error interno del servidor. No se pudieron obtener las ventas.' }), { status: 500 });
     }
