@@ -523,8 +523,8 @@ async function prismaSaleToSaleDetails(prismaSale: { id: string; date: Date; tot
 }
 
 export async function getForeignSales(limit?: number, offset?: number) {
-    const sales = await prisma.sale.findMany({
-            where: { isDeleted: false },
+    const [sales, total] = await Promise.all([
+        prisma.sale.findMany({
             select: {
                 id: true,
                 date: true,
@@ -534,8 +534,11 @@ export async function getForeignSales(limit?: number, offset?: number) {
             orderBy: { date: "desc" },
             take: limit,
             skip: offset
-        });
-    return sales;
+        }),
+        prisma.sale.count(),
+    ]);
+
+    return { sales, total };
 }
 
 export async function getSales(sellerId?: string): Promise<SaleDetails[]> {
