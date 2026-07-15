@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && prisma migrate dev && prisma db seed && next dev",
+    "dev": "next dev",
+    "dev:full": "prisma generate && prisma migrate dev && prisma db seed && next dev",
     "ngrok": "ngrok http 3000",
     "build": "next build",
     "vercel-build": "prisma generate && next build",
