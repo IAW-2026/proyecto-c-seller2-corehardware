@@ -528,7 +528,11 @@ export async function getForeignSales(limit?: number, offset?: number) {
             select: {
                 id: true,
                 date: true,
-                sellerId: true,
+                seller: {
+                    select: {
+                        name: true,
+                    }
+                },
                 totalPrice: true,
             },
             orderBy: { date: "desc" },
