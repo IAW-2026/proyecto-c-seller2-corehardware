@@ -2,7 +2,11 @@ import { headers } from "next/headers";
 import { getForeignSales } from "@/app/lib/actions";
 
 
-export async function GET() {
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : undefined;
+    const offset = searchParams.get("offset") ? parseInt(searchParams.get("offset")!) : undefined;
+
     const requestHeaders = await headers();
     const apiKey = requestHeaders.get("X-API-Key");
 
@@ -11,7 +15,7 @@ export async function GET() {
     }
 
     try {
-        const sales = await getForeignSales();
+        const sales = await getForeignSales(limit, offset);
         return new Response(JSON.stringify(sales), { status: 200 });
     } catch (e) {
         return new Response(JSON.stringify({ message: 'Error interno del servidor. No se pudieron obtener las ventas.' }), { status: 500 });
