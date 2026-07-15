@@ -528,7 +528,11 @@ export async function getForeignSales(limit?: number, offset?: number) {
             select: {
                 id: true,
                 date: true,
-                sellerId: true,
+                seller: {
+                    select: {
+                        name: true,
+                    }
+                },
                 totalPrice: true,
             },
             orderBy: { date: "desc" },
@@ -537,8 +541,17 @@ export async function getForeignSales(limit?: number, offset?: number) {
         }),
         prisma.sale.count(),
     ]);
+    
 
-    return { sales, total };
+    return {
+        sales: sales.map((sale) => ({
+            id: sale.id,
+            date: sale.date,
+            totalPrice: sale.totalPrice.toString(),
+            sellerName: sale.seller.name,
+        })),
+        total,
+    };
 }
 
 export async function getSales(sellerId?: string): Promise<SaleDetails[]> {
