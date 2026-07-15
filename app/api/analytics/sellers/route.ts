@@ -13,6 +13,11 @@ export async function GET() {
         const items = sellers.map((s) => ({
             id: s.id,
             razon_social: s.name,
+            cuit: s.CUIT,
+            mail: s.email,
+            celular: s.phoneNumber,
+            condicion_iva: s.VATCondition,
+            fecha_creacion: s.createdAt.toISOString(),
         }));
         return new Response(JSON.stringify({ total: items.length, items }), { status: 200 });
     } catch (e) {
