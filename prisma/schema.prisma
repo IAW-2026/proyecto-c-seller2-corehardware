@@ -43,6 +43,7 @@ model Seller {
   products          Product[]
   sales             Sale[]
   isDeleted         Boolean   @default(false)
+  createdAt         DateTime  @default(now())
 }
 
 model Sale {
