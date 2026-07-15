@@ -515,7 +515,7 @@ async function prismaSaleToSaleDetails(prismaSale: { id: string; date: Date; tot
     };
 }
 
-export async function getForeignSales(){
+export async function getForeignSales(limit?: number, offset?: number) {
     const sales = await prisma.sale.findMany({
             where: { isDeleted: false },
             select: {
@@ -525,6 +525,8 @@ export async function getForeignSales(){
                 totalPrice: true,
             },
             orderBy: { date: "desc" },
+            take: limit,
+            skip: offset
         });
     return sales;
 }
