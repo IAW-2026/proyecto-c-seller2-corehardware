@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  name           String
+  seller         Seller          @relation(fields: [sellerId], references: [id])
+  sellerId       String
+  brand          String
+  model          String
+  price          Decimal
+  description    String
+  specs          String
+  warranty       String
+  stock          Int
+  image          String
+  isDeleted      Boolean         @default(false)
+  isListed       Boolean         @default(true)
+  productOnSales ProductOnSale[]
+}
+
+model Seller {
+  id                String    @id @default(cuid())
+  CUIT              String
+  name              String
+  address           String
+  email             String
+  phoneNumber       String
+  startOfActivities DateTime
+  VATCondition      String
+  ClerkUserId       String?
+  products          Product[]
+  sales             Sale[]
+  isDeleted         Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+}
+
+model Sale {
+  id             String          @id @default(cuid())
+  date           DateTime
+  seller         Seller          @relation(fields: [sellerId], references: [id])
+  sellerId       String
+  totalPrice     Decimal
+  isDeleted      Boolean         @default(false)
+  productOnSales ProductOnSale[]
+}
+
+model ProductOnSale {
+  saleId        String
+  productId     String
+  productAmount Int
+  sale          Sale    @relation(fields: [saleId], references: [id])
+  product       Product @relation(fields: [productId], references: [id])
+
+  @@id([saleId, productId])
+}

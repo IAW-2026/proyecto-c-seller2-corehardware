@@ -1,0 +1,69 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
+-- CreateTable
+CREATE TABLE "Product" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "sellerId" TEXT NOT NULL,
+    "brand" TEXT NOT NULL,
+    "model" TEXT NOT NULL,
+    "price" DECIMAL(65,30) NOT NULL,
+    "description" TEXT NOT NULL,
+    "specs" TEXT NOT NULL,
+    "warranty" TEXT NOT NULL,
+    "stock" INTEGER NOT NULL,
+    "image" TEXT NOT NULL,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "isListed" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Seller" (
+    "id" TEXT NOT NULL,
+    "CUIT" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phoneNumber" TEXT NOT NULL,
+    "startOfActivities" TIMESTAMP(3) NOT NULL,
+    "VATCondition" TEXT NOT NULL,
+    "ClerkUserId" TEXT,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "Seller_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Sale" (
+    "id" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "sellerId" TEXT NOT NULL,
+    "totalPrice" DECIMAL(65,30) NOT NULL,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "Sale_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ProductOnSale" (
+    "saleId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "productAmount" INTEGER NOT NULL,
+
+    CONSTRAINT "ProductOnSale_pkey" PRIMARY KEY ("saleId","productId")
+);
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductOnSale" ADD CONSTRAINT "ProductOnSale_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "Sale"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductOnSale" ADD CONSTRAINT "ProductOnSale_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
