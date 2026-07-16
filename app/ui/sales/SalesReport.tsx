@@ -3,16 +3,17 @@ import { getSales, getTotalSalesValue, SaleDetails } from "@lib/actions";
 
 export default async function SalesReport( { sellerId=undefined }:{ sellerId?: string }) {
     const sales: SaleDetails[] = sellerId ? await getSales(sellerId) : await getSales();
-    const totalSalesValue = (sales.map(sale => parseFloat(sale.totalPrice) * 100).reduce((sum, current) => sum + current, 0.00) / 100).toString();
-    const totalSalesValueWithoutShipping = (sales.map(sale => parseFloat(sale.priceWithoutShipping) * 100).reduce((sum, current) => sum + current, 0.00) / 100).toString();
+    const totalSalesValue = sales.map(sale => parseFloat(sale.totalPrice) * 100).reduce((sum, current) => sum + current, 0.00) / 100;
+    const totalSalesValueWithoutShipping = sales.map(sale => parseFloat(sale.priceWithoutShipping) * 100).reduce((sum, current) => sum + current, 0.00) / 100;
+    const formatCurrency = (value: string | number) => `$${parseFloat(value.toString()).toFixed(2)}`;
 
     return (
         <div className="space-y-6">
             <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
                 <h2 className="text-sm text-zinc-500">Valor Total de Ventas</h2>
                 <div className="mt-2 space-y-1">
-                    <p className="text-2xl font-semibold text-gray-900 dark:text-white">${totalSalesValue}</p>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Sin envío: ${totalSalesValueWithoutShipping}</p>
+                    <p className="text-2xl font-semibold text-gray-900 dark:text-white">{formatCurrency(totalSalesValue)}</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Sin envío: {formatCurrency(totalSalesValueWithoutShipping)}</p>
                 </div>
             </div>
 
@@ -27,11 +28,11 @@ export default async function SalesReport( { sellerId=undefined }:{ sellerId?: s
                                 <div className="mt-3 space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
                                     <div>
                                         <strong>Con envío: </strong>
-                                        <span className="font-medium">${sale.totalPrice}</span>
+                                        <span className="font-medium">{formatCurrency(sale.totalPrice)}</span>
                                     </div>
                                     <div>
                                         <strong>Sin envío: </strong>
-                                        <span className="font-medium">${sale.priceWithoutShipping}</span>
+                                        <span className="font-medium">{formatCurrency(sale.priceWithoutShipping)}</span>
                                     </div>
                                 </div>
 
